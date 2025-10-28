@@ -1,16 +1,14 @@
 // src/components/ChartComponent.jsx
 import { useState, useEffect, type ChangeEventHandler } from 'react';
 import EChartsReact, { type EChartsOption } from 'echarts-for-react';
-import client from './client';
-import { calculateMA, error, init, last, loading, match, toAUD, toChartData, value, type AsyncResult, type StockDataForChart, type YahooStockData } from './lib';
+import client from '@/client';
+import { error, init, last, loading, match, symbols, value, type AsyncResult, type StockSymbol } from '@/lib';
+import type { YahooStockData } from '@/data-loaders/yahoo-finance-charts';
 
 
-type Symbol = "IOO" | "VAP" | "ETPMPM";
-const symbols: Symbol[] = ["IOO", "VAP", "ETPMPM"];
-
-const SymbolPicker = ({ value, onChange }: { value: Symbol; onChange?: ChangeEventHandler<HTMLSelectElement> }) => (
+const StockSymbolPicker = ({ value, onChange }: { value: StockSymbol; onChange?: ChangeEventHandler<HTMLSelectElement> }) => (
     <>
-    <label>Symbol: </label>
+    <label>StockSymbol: </label>
     <select value={value} onChange={onChange}>
         {symbols.map((k) => <option key={k} value={k}>{k}</option>)}
     </select>
@@ -18,7 +16,7 @@ const SymbolPicker = ({ value, onChange }: { value: Symbol; onChange?: ChangeEve
 );
 
 interface ChartComponentProps {
-    initialSymbol: Symbol;
+    initialStockSymbol: StockSymbol;
     initalBuyPrice: number;
     initialStock: number;
     history: number;
@@ -27,6 +25,99 @@ interface ChartComponentProps {
 const upColor = '#00da3c';
 const downColor = '#ec0000';
 
+const toChartData = (rawData: YahooStockData, history: number): StockDataForChart => {
+
+  const r = rawData.chart.result[0];
+
+    if(r === undefined) {
+        throw new Error("unhandled");
+    }
+
+  const q = r.indicators.quote[0];
+
+    if(q === undefined) {
+        throw new Error("unhandled");
+    }
+
+  const startat = (r.timestamp.length ?? 0) - history;
+
+
+  const vals: ChartValues = r.timestamp.slice(startat).map((value, index, array) => 
+        [
+            q.open.at(startat + index) ?? 0,
+            q.close.at(startat + index) ?? 0,
+            q.low.at(startat + index) ?? 0,
+            q.high.at(startat + index) ?? 0,
+            q.volume.at(startat + index) ?? 0,
+        ]
+    );
+
+
+  const volumes: ChartVolumes = r.timestamp.slice(startat).map((value, index, array) =>
+        [
+            startat + index,
+            q.volume.at(startat + index) ?? 0,
+            (q.open.at(startat + index) ?? 0) > (q.close.at(startat + index) ?? 0) ? 1 : -1
+        ]
+    );
+
+  const data: StockDataForChart = {
+    categoryData: r.timestamp.slice(startat).map((value) => new Date(value * 1000).toISOString().slice(0, 10)),
+    values: vals,
+    volumes: volumes
+  };
+
+  return data;
+};
+
+
+function calculateMA(dayCount: number, data: StockDataForChart) {
+  var result = [];
+  for (var i = 0, len = data.values.length; i < len; i++) {
+    if (i < dayCount) {
+      result.push('-');
+      continue;
+    }
+    var sum = 0;
+    for (var j = 0; j < dayCount; j++) {
+
+      data.values;
+
+      sum += data.values[i - j]?.[1] ?? 0;
+    }
+    result.push(+(sum / dayCount).toFixed(3));
+  }
+  return result;
+}
+
+/**
+ * open,
+ * close,
+ * low,
+ * high,
+ * volume,
+ */
+type ChartValues = [number, number, number, number, number][];
+
+/**
+ * index,
+ * volume,
+ * direction ? 1 (up) : -1 (down)
+ */
+type ChartVolumes = [number, number, -1|1][];
+
+export interface StockDataForChart {
+    categoryData: string[];
+    /**
+     * open,
+     * close,
+     * low,
+     * high,
+     * volume,
+     */
+    values: ChartValues;
+    volumes: ChartVolumes;
+}
 
 const toChartOptions = (v: StockDataForChart, buyPrice: number): EChartsOption => {
 
@@ -240,7 +331,7 @@ const toChartOptions = (v: StockDataForChart, buyPrice: number): EChartsOption =
 
 const ChartComponent = (props: ChartComponentProps) => {
 
-  const [symbol, setSymbol] = useState<Symbol>(props.initialSymbol);
+  const [symbol, setStockSymbol] = useState<StockSymbol>(props.initialStockSymbol);
   const [asyncState, setAsyncState] = useState<AsyncResult<YahooStockData, Error>>(init<YahooStockData>());
 
     const [buyPrice, setBuyPrice] = useState<number>(props.initalBuyPrice);
@@ -277,7 +368,7 @@ const ChartComponent = (props: ChartComponentProps) => {
                   match(asyncState, {
     init: () => <></>,
     error: (e) => <pre>{e.message} {e.name} {e.stack ?? ""}</pre>,
-    loading: () => <h2>{props.initialSymbol} Loading...</h2>,
+    loading: () => <h2>{props.initialStockSymbol} Loading...</h2>,
     value: (val) => {
         
         // TODO: this is probably expensive to render... consider precalculating.
@@ -297,9 +388,9 @@ const ChartComponent = (props: ChartComponentProps) => {
 
         return (
 <>
-            <h2>{props.initialSymbol} {props.history}-Day Candlestick Chart</h2>
+            <h2>{props.initialStockSymbol} {props.history}-Day Candlestick Chart</h2>
 
-            {/* <SymbolPicker value={symbol} onChange={(e) => setSymbol(e.target.value as Symbol)} />
+            {/* <StockSymbolPicker value={symbol} onChange={(e) => setStockSymbol(e.target.value as StockSymbol)} />
 
             <label>Buy Price: </label>
             <input

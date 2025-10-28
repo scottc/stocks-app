@@ -1,5 +1,5 @@
 import { useState } from "react";
-import "./index.css";
+import "@/index.css";
 
 import StockChart from "./StockChart";
 import StockTable from "./StockTable";
@@ -46,7 +46,7 @@ export function App() {
       >
         <div>
           <StockTicker
-            initialSymbol="IOO"
+            initialStockSymbol="IOO"
             initalBuyPrice={185.295}
             initialStock={269}
             history={daysHistory}
@@ -54,7 +54,7 @@ export function App() {
         </div>
         <div>
           <StockTicker
-            initialSymbol="VAP"
+            initialStockSymbol="VAP"
             initalBuyPrice={0}
             initialStock={0}
             history={daysHistory}
@@ -62,7 +62,7 @@ export function App() {
         </div>
         <div>
           <StockTicker
-            initialSymbol="ETPMPM"
+            initialStockSymbol="ETPMPM"
             initalBuyPrice={0}
             initialStock={0}
             history={daysHistory}
@@ -70,7 +70,7 @@ export function App() {
         </div>
         <div>
           <StockTicker
-            initialSymbol="IOO"
+            initialStockSymbol="IOO"
             initalBuyPrice={185.295}
             initialStock={269}
             history={daysHistory}
@@ -78,7 +78,7 @@ export function App() {
         </div>
         <div>
           <StockTicker
-            initialSymbol="VAP"
+            initialStockSymbol="VAP"
             initalBuyPrice={0}
             initialStock={0}
             history={daysHistory}
@@ -86,7 +86,7 @@ export function App() {
         </div>
         <div>
           <StockTicker
-            initialSymbol="ETPMPM"
+            initialStockSymbol="ETPMPM"
             initalBuyPrice={0}
             initialStock={0}
             history={daysHistory}
@@ -95,7 +95,7 @@ export function App() {
 
         <div>
           <StockHoldings
-            initialSymbol="IOO"
+            initialStockSymbol="IOO"
             initalBuyPrice={185.295}
             initialStock={269}
             history={daysHistory}
@@ -103,7 +103,7 @@ export function App() {
         </div>
         <div>
           <StockHoldings
-            initialSymbol="VAP"
+            initialStockSymbol="VAP"
             initalBuyPrice={0}
             initialStock={0}
             history={daysHistory}
@@ -111,7 +111,7 @@ export function App() {
         </div>
         <div>
           <StockHoldings
-            initialSymbol="ETPMPM"
+            initialStockSymbol="ETPMPM"
             initalBuyPrice={0}
             initialStock={0}
             history={daysHistory}
@@ -119,7 +119,7 @@ export function App() {
         </div>
         <div>
           <StockHoldings
-            initialSymbol="IOO"
+            initialStockSymbol="IOO"
             initalBuyPrice={185.295}
             initialStock={269}
             history={daysHistory}
@@ -127,7 +127,7 @@ export function App() {
         </div>
         <div>
           <StockHoldings
-            initialSymbol="VAP"
+            initialStockSymbol="VAP"
             initalBuyPrice={0}
             initialStock={0}
             history={daysHistory}
@@ -135,7 +135,7 @@ export function App() {
         </div>
         <div>
           <StockHoldings
-            initialSymbol="ETPMPM"
+            initialStockSymbol="ETPMPM"
             initalBuyPrice={0}
             initialStock={0}
             history={daysHistory}
@@ -144,7 +144,7 @@ export function App() {
 
         <div>
           <StockChart
-            initialSymbol="IOO"
+            initialStockSymbol="IOO"
             initalBuyPrice={185.295}
             initialStock={269}
             history={daysHistory}
@@ -152,7 +152,7 @@ export function App() {
         </div>
         <div>
           <StockChart
-            initialSymbol="VAP"
+            initialStockSymbol="VAP"
             initalBuyPrice={0}
             initialStock={0}
             history={daysHistory}
@@ -160,7 +160,7 @@ export function App() {
         </div>
         <div>
           <StockChart
-            initialSymbol="ETPMPM"
+            initialStockSymbol="ETPMPM"
             initalBuyPrice={0}
             initialStock={0}
             history={daysHistory}
@@ -168,7 +168,7 @@ export function App() {
         </div>
         <div>
           <StockChart
-            initialSymbol="IOO"
+            initialStockSymbol="IOO"
             initalBuyPrice={185.295}
             initialStock={269}
             history={daysHistory}
@@ -176,7 +176,7 @@ export function App() {
         </div>
         <div>
           <StockChart
-            initialSymbol="VAP"
+            initialStockSymbol="VAP"
             initalBuyPrice={0}
             initialStock={0}
             history={daysHistory}
@@ -184,7 +184,7 @@ export function App() {
         </div>
         <div>
           <StockChart
-            initialSymbol="ETPMPM"
+            initialStockSymbol="ETPMPM"
             initalBuyPrice={0}
             initialStock={0}
             history={daysHistory}
@@ -192,22 +192,22 @@ export function App() {
         </div>
 
         <div>
-          <StockTable initialSymbol="IOO" history={daysHistory} />
+          <StockTable initialStockSymbol="IOO" history={daysHistory} />
         </div>
         <div>
-          <StockTable initialSymbol="VAP" history={daysHistory} />
+          <StockTable initialStockSymbol="VAP" history={daysHistory} />
         </div>
         <div>
-          <StockTable initialSymbol="ETPMPM" history={daysHistory} />
+          <StockTable initialStockSymbol="ETPMPM" history={daysHistory} />
         </div>
         <div>
-          <StockTable initialSymbol="IOO" history={daysHistory} />
+          <StockTable initialStockSymbol="IOO" history={daysHistory} />
         </div>
         <div>
-          <StockTable initialSymbol="VAP" history={daysHistory} />
+          <StockTable initialStockSymbol="VAP" history={daysHistory} />
         </div>
         <div>
-          <StockTable initialSymbol="ETPMPM" history={daysHistory} />
+          <StockTable initialStockSymbol="ETPMPM" history={daysHistory} />
         </div>
       </div>
     </>

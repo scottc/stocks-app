@@ -1,20 +1,13 @@
 import { useState, useEffect, type CSSProperties } from 'react';
-import client from './client';
-import { color, error, init, last, loading, match, pctDiff, toAUD, toDecimalAU, toPercentAU, value, type AsyncResult, type YahooStockData } from './lib';
+import client from '@/client';
+import { color, error, init, last, loading, match, pctDiff, toAUD, toDecimalAU, toPercentAU, value, type AsyncResult, type StockSymbol } from '@/lib';
 import React from 'react';
-
-
-type Symbol = "IOO" | "VAP" | "ETPMPM";
-const symbols: Symbol[] = ["IOO", "VAP", "ETPMPM"];
-
+import type { YahooStockData } from '@/data-loaders/yahoo-finance-charts';
 
 interface StockTableProps {
-    initialSymbol: Symbol;
+    initialStockSymbol: StockSymbol;
     history: number;
 }
-
-const upColor = '#00da3c';
-const downColor = '#ec0000';
 
 const StockTable = (props: StockTableProps) => {
 
@@ -25,7 +18,7 @@ const StockTable = (props: StockTableProps) => {
     const fetchData = async () => {
       try {
         setAsyncState(loading());
-        const response = await client.api.yahoo({ symbol: props.initialSymbol }).get();
+        const response = await client.api.yahoo({ symbol: props.initialStockSymbol }).get();
         setAsyncState(
             response.data?.value
                 ? value(response.data.value)
@@ -45,13 +38,13 @@ const StockTable = (props: StockTableProps) => {
 
   return (<>
           <div style={{border: "5px solid black", margin: "10px", padding:"10px", background: "rgba(0,0,0,0.2)" }}>
-            <h2>{props.initialSymbol} {props.history}-Day Trade History</h2>
+            <h2>{props.initialStockSymbol} {props.history}-Day Trade History</h2>
 
             {
                   match(asyncState, {
     init: () => <></>,
     error: (e) => <>{e.message}</>,
-    loading: () => <>{props.initialSymbol} Loading...</>,
+    loading: () => <>{props.initialStockSymbol} Loading...</>,
     value: (val) => {
         
         const r = val.chart.result[0];

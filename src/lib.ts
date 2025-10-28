@@ -1,165 +1,3 @@
-/**
- * open,
- * close,
- * low,
- * high,
- * volume,
- */
-type ChartValues = [number, number, number, number, number][];
-
-/**
- * index,
- * volume,
- * direction ? 1 (up) : -1 (down)
- */
-type ChartVolumes = [number, number, -1|1][];
-
-export interface StockDataForChart {
-    categoryData: string[];
-    /**
-     * open,
-     * close,
-     * low,
-     * high,
-     * volume,
-     */
-    values: ChartValues;
-    volumes: ChartVolumes;
-}
-
-export interface YahooStockData {
-    chart: YahooChart;
-}
-
-export interface YahooChart {
-    result: YahooChartResultItem[];
-    error: null;
-}
-
-export interface YahooChartResultItem {
-    meta: YahooMeta;
-    timestamp: number[];
-    indicators: YahooChartIndicators;
-}
-
-export interface YahooMeta {
-    currency: any;
-    symbol: string;
-    exchangeName: any;
-    fullExchangeName: any;
-    instrumentType: any;
-    firstTradeDate: any;
-    regularMarketTime: any;
-    hasPrePostMarketData: any;
-    gmtoffset: any;
-    timezone: any;
-    exchangeTimezoneName: any;
-    regularMarketPrice: any;
-    fiftyTwoWeekHigh: any;
-    fiftyTwoWeekLow: any;
-    regularMarketDayHigh: any;
-    regularMarketDayLow: any;
-    regularMarketVolume: any;
-    longName: string;
-    shortName: string;
-    chartPreviousClose: any;
-    priceHint: any;
-    currentTradingPeriod: TradingPeriods;
-    dataGranularity: any;
-    range: any;
-    validRanges: any; 
-}
-
-export interface TradingPeriods {
-  pre: TradingHours;
-  regular: TradingHours;
-  post: TradingHours;
-}
-
-export interface TradingHours { timezone: string, start: number, end:number, gmtoffset: number }
-
-export interface YahooChartIndicators {
-    quote: YahooQuote[];
-    adjclose: number[];
-}
-
-export interface YahooQuote {
-    high: number[];
-    volume: number[];
-    close: number[];
-    low: number[];
-    open: number[];
-}
-
-const toAUD = (value: number | bigint | Intl.StringNumericLiteral): string => 
-  new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD' }).format(value);
-
-
-const toChartData = (rawData: YahooStockData, history: number): StockDataForChart => {
-
-  const r = rawData.chart.result[0];
-
-    if(r === undefined) {
-        throw new Error("unhandled");
-    }
-
-  const q = r.indicators.quote[0];
-
-    if(q === undefined) {
-        throw new Error("unhandled");
-    }
-
-  const startat = (r.timestamp.length ?? 0) - history;
-
-
-  const vals: ChartValues = r.timestamp.slice(startat).map((value, index, array) => 
-        [
-            q.open.at(startat + index) ?? 0,
-            q.close.at(startat + index) ?? 0,
-            q.low.at(startat + index) ?? 0,
-            q.high.at(startat + index) ?? 0,
-            q.volume.at(startat + index) ?? 0,
-        ]
-    );
-
-
-  const volumes: ChartVolumes = r.timestamp.slice(startat).map((value, index, array) =>
-        [
-            startat + index,
-            q.volume.at(startat + index) ?? 0,
-            (q.open.at(startat + index) ?? 0) > (q.close.at(startat + index) ?? 0) ? 1 : -1
-        ]
-    );
-
-  const data: StockDataForChart = {
-    categoryData: r.timestamp.slice(startat).map((value) => new Date(value * 1000).toISOString().slice(0, 10)),
-    values: vals,
-    volumes: volumes
-  };
-
-  return data;
-};
-
-
-function calculateMA(dayCount: number, data: StockDataForChart) {
-  var result = [];
-  for (var i = 0, len = data.values.length; i < len; i++) {
-    if (i < dayCount) {
-      result.push('-');
-      continue;
-    }
-    var sum = 0;
-    for (var j = 0; j < dayCount; j++) {
-
-      data.values;
-
-      sum += data.values[i - j]?.[1] ?? 0;
-    }
-    result.push(+(sum / dayCount).toFixed(3));
-  }
-  return result;
-}
-
 export interface ValueResult<T, E> {
     type: "value";
     value: T;
@@ -259,9 +97,13 @@ function pctDiff(close: number, open: number): number {
   return ((close - open) / open);
 }
 
+const up = "▲";
+const eq = "▶"
+const down = "▼";
+
 const upColor = '#00da3c';
-const downColor = '#ec0000';
 const eqColor = '#ecda3c';
+const downColor = '#ec0000';
 
 const color = (x :number) => {
   if (x > 0) {
@@ -272,10 +114,6 @@ const color = (x :number) => {
     return eqColor;
   }
 }
-
-const up = "▲";
-const down = "▼";
-const eq = "▶"
 
 const icon = (x :number) => {
   if (x > 0) {
@@ -296,9 +134,13 @@ const toPercentAU = (value :number) =>
 const toUnitAU = (value :number) => 
   new Intl.NumberFormat('en-AU', { style: "unit" }).format(value);
 
+const toAUD = (value: number | bigint | Intl.StringNumericLiteral): string => 
+  new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD' }).format(value);
+
+export type StockSymbol = "IOO" | "VAP" | "ETPMPM";
+export const symbols: StockSymbol[] = ["IOO", "VAP", "ETPMPM"];
+
 export {
-    toChartData,
-    calculateMA,
     value,
     error,
     loading,

@@ -1,31 +1,21 @@
 // src/components/ChartComponent.jsx
 import { useState, useEffect, type CSSProperties } from "react";
-import client from "./client";
+import client from "@/client";
 import {
-  color,
   error,
   first,
-  icon,
   init,
   last,
   loading,
   match,
-  pctDiff,
-  previous,
-  toAUD,
-  toDecimalAU,
-  toPercentAU,
-  toUnitAU,
   value,
   type AsyncResult,
-  type YahooStockData,
-} from "./lib";
-
-type Symbol = "IOO" | "VAP" | "ETPMPM";
-const symbols: Symbol[] = ["IOO", "VAP", "ETPMPM"];
+  type StockSymbol,
+} from "@/lib";
+import type { YahooStockData } from "@/data-loaders/yahoo-finance-charts";
 
 interface ChartComponentProps {
-  initialSymbol: Symbol;
+  initialStockSymbol: StockSymbol;
   initalBuyPrice: number;
   initialStock: number;
   history: number;
@@ -42,7 +32,7 @@ const ChartComponent = (props: ChartComponentProps) => {
       try {
         setAsyncState(loading());
         const response = await client.api
-          .yahoo({ symbol: props.initialSymbol })
+          .yahoo({ symbol: props.initialStockSymbol })
           .get();
         setAsyncState(
           response.data?.value
@@ -70,7 +60,7 @@ const ChartComponent = (props: ChartComponentProps) => {
           background: "rgba(0,0,0,0.2)",
         }}
       >
-        <h2>{props.initialSymbol} Information</h2>
+        <h2>{props.initialStockSymbol} Information</h2>
 
         {match(asyncState, {
           init: () => <></>,
@@ -79,7 +69,7 @@ const ChartComponent = (props: ChartComponentProps) => {
               {e.message} {e.name} {e.stack ?? ""}
             </pre>
           ),
-          loading: () => <>{props.initialSymbol} Loading...</>,
+          loading: () => <>{props.initialStockSymbol} Loading...</>,
           value: (val) => {
             const r = val.chart.result[0];
 
@@ -260,11 +250,12 @@ const ChartComponent = (props: ChartComponentProps) => {
             </table> */}
 
                 <p>
+                  Commsec{" | "}
                   <a
                     target="_blank"
-                    href={`https://www2.commsec.com.au/Quotes?stockCode=${props.initialSymbol}&exchangeCode=ASX`}
+                    href={`https://www2.commsec.com.au/Quotes?stockCode=${props.initialStockSymbol}&exchangeCode=ASX`}
                   >
-                    Commsec {props.initialSymbol} Quotes
+                    {props.initialStockSymbol} Quotes
                   </a>
                 </p>
               </>
