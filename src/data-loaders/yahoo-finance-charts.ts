@@ -85,7 +85,7 @@ const yahooApiFetch = async (
     if (symbol === "unknown") {
       console.log(symbol);
       // console.log(JSON.stringify(params, null, 2));
-      throw new Error("unknown ticker");
+      throw new Error("unhandled");
     }
 
     const now = Math.floor(Date.now() / 1000); // Current Unix timestamp (seconds)

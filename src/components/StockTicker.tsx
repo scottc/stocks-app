@@ -13,42 +13,24 @@ import {
   type StockSymbol,
 } from "@/lib";
 import type { YahooStockData } from "@/data-loaders/yahoo-finance-charts";
+import { useYahooStock } from "@/hooks/useYahooStock";
+import { useCommsecHoldings } from "@/hooks/useCommsecHoldings";
+import { ErrorView } from "./Error";
 
 interface ChartComponentProps {
   initialStockSymbol: StockSymbol;
-  initalBuyPrice: number;
-  initialStock: number;
   history: number;
 }
 
-const ChartComponent = (props: ChartComponentProps) => {
-  const [asyncState, setAsyncState] =
-    useState<AsyncResult<YahooStockData, Error>>(init<YahooStockData>());
+const ChartComponent = ({ history, initialStockSymbol }: ChartComponentProps) => {
 
-  const [option, setOption] = useState<"single" | "sum" | "average">("single");
+  const stocks = useYahooStock({ symbol: initialStockSymbol });
+  const holdings = useCommsecHoldings({});
+  // const transactions = useCommsecTransactions({});
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setAsyncState(loading());
-        const response = await client.api
-          .yahoo({ symbol: props.initialStockSymbol })
-          .get();
-        setAsyncState(
-          response.data?.value
-            ? value(response.data.value)
-            : error(new Error("some err")),
-        );
-      } catch (err) {
-        console.error(err);
-        setAsyncState(error(new Error("some err rerrr")));
-      } finally {
-        // setAsyncState("loading");
-      }
-    };
-
-    fetchData();
-  }, []);
+  const relevantHoldings = holdings.type === "value" ? holdings.value.holdings.filter(x => x.code === initialStockSymbol) : [];
+  const purchasePrice = relevantHoldings.at(0)?.purchasePrice ?? 0;
+  const availUnits = relevantHoldings.at(0)?.availUnits ?? 0;
 
   return (
     <>
@@ -60,24 +42,18 @@ const ChartComponent = (props: ChartComponentProps) => {
           background: "rgba(0,0,0,0.2)",
         }}
       >
-        <h2>{props.initialStockSymbol} Information</h2>
+        <h2>Yahoo {initialStockSymbol} Information</h2>
 
-        {match(asyncState, {
+        {match(stocks, {
           init: () => <></>,
-          error: (e) => (
-            <pre>
-              {e.message} {e.name} {e.stack ?? ""}
-            </pre>
-          ),
-          loading: () => <>{props.initialStockSymbol} Loading...</>,
+          error: (e) => (<ErrorView error={e} />),
+          loading: () => <>{initialStockSymbol} Loading...</>,
           value: (val) => {
             const r = val.chart.result[0];
 
             const q = first(r?.indicators.quote);
             const meta = val.chart.result[0]?.meta;
-            const profit =
-              ((last(q?.close) ?? 0) - props.initalBuyPrice) *
-              props.initialStock;
+            const profit = ((last(q?.close) ?? 0) - purchasePrice) * availUnits;
 
             const style: CSSProperties = {
               border: "2px solid rgb(140 140 140)",
@@ -253,9 +229,9 @@ const ChartComponent = (props: ChartComponentProps) => {
                   Commsec{" | "}
                   <a
                     target="_blank"
-                    href={`https://www2.commsec.com.au/Quotes?stockCode=${props.initialStockSymbol}&exchangeCode=ASX`}
+                    href={`https://www2.commsec.com.au/Quotes?stockCode=${initialStockSymbol}&exchangeCode=ASX`}
                   >
-                    {props.initialStockSymbol} Quotes
+                    {initialStockSymbol} Quotes
                   </a>
                 </p>
               </>

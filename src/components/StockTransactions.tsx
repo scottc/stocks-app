@@ -1,7 +1,7 @@
 // src/components/ChartComponent.jsx
-import { type CSSProperties } from "react";
+import { useState, type CSSProperties } from "react";
 import { useYahooStock } from "@/hooks/useYahooStock";
-import { useCommsecHoldings } from "@/hooks/useCommsecHoldings";
+import { useCommsecTransactions } from "@/hooks/useCommsecTransactions";
 
 import {
   first,
@@ -9,7 +9,7 @@ import {
   match,
   type StockSymbol,
 } from "@/lib";
-import { useCommsecTransactions } from "@/hooks/useCommsecTransactions";
+import { useCommsecHoldings } from "@/hooks/useCommsecHoldings";
 import { ErrorView } from "./Error";
 
 
@@ -23,14 +23,14 @@ const style: CSSProperties = {
   borderCollapse: "collapse",
 };
 
-const StockHoldings = ({
+const ChartComponent = ({
   initialStockSymbol,
   history
 }: ChartComponentProps) => {
 
   const stocks = useYahooStock({ symbol: initialStockSymbol });
   const holdings = useCommsecHoldings({});
-  // const transactions = useCommsecTransactions({});
+  const transactions = useCommsecTransactions({});
 
   const relevantHoldings = holdings.type === "value" ? holdings.value.holdings.filter(x => x.code === initialStockSymbol) : [];
   const purchasePrice = relevantHoldings.at(0)?.purchasePrice ?? 0;
@@ -45,38 +45,43 @@ const StockHoldings = ({
         background: "rgba(0,0,0,0.2)",
       }}
     >
-      <h2>Commsec {initialStockSymbol} Holdings</h2>
+      <h2>Commsec {initialStockSymbol} Transactions</h2>
 
-      {match(holdings, {
+      {match(transactions, {
         init: () => (<></>),
         loading: () => (<></>),
         value: (v) => {
           
-          const relevant = v.holdings.filter(x => x.code === initialStockSymbol);
+          const relevant = v.filter(x => x.details.includes(initialStockSymbol));
 
           return (<>
-
-            <p>As of: {v.asOfDateTime}</p>
-
           <table style={style}>
             <thead>
               <tr>
-                <th>Units</th>
-                <th>Purchase Price</th>
+                <th>Date</th>
+                <th>Reference</th>
+                <th>Details</th>
+                <th>Debit</th>
+                <th>Credit</th>
+                <th>Balance</th>
               </tr>
             </thead>
             <tbody>
-              {relevant.map((h) => (
+              {relevant.map((t) => (
                 <tr>
-                  <td>{h.availUnits}</td>
-                  <td>{h.purchasePrice}</td>
+                  <td>{t.date}</td>
+                  <td>{t.reference}</td>
+                  <td>{t.details}</td>
+                  <td>{t.debit}</td>
+                  <td>{t.credit}</td>
+                  <td>{t.balance}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </>);
         },
-        error: (e) => <ErrorView error={e} />,
+        error: (e) => (<ErrorView error={e} />),
       })}
 
       {match(stocks, {
@@ -97,6 +102,52 @@ const StockHoldings = ({
 
           return (
             <>
+              {/* <h3>Transactions</h3>
+              <table style={style}>
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Reference</th>
+                    <th>Buy or Sell</th>
+                    <th>Units</th>
+                    <th>StockSymbol</th>
+                    <th>Price</th>
+                    <th>debit / credit / Balance</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>2025-10-24</td>
+                    <td>167683575</td>
+                    <td>B</td>
+                    <td>{toDecimalAU(initialStock)}</td>
+                    <td>{initialStockSymbol}</td>
+                    <td>{toAUD(initalBuyPrice)}</td>
+                    <td>{toAUD(initalBuyPrice * initialStock)}</td>
+                  </tr>
+                </tbody>
+              </table> */}
+
+              {/* <h3>Summary:</h3>
+              <p>
+                Total:
+                <br />
+                Investment: {toAUD(initalBuyPrice * initialStock)}
+                <br />
+                Units: {toDecimalAU(initialStock)}
+                <br />
+                Profit per Unit: {toAUD(currentPrice - initalBuyPrice)}
+                <br />
+                Profit per Day: {toAUD(0.0)}
+                <br />
+                Total Profit:{" "}
+                <span style={{ color: color(profit) }}>
+                  {icon(profit)}
+                  {toAUD(profit)} (
+                  {toPercentAU(pctDiff(currentPrice, initalBuyPrice))})
+                </span>
+              </p> */}
+
               <p>
                 Commsec{" | "}
                 <a
@@ -123,4 +174,4 @@ const StockHoldings = ({
   );
 };
 
-export default StockHoldings;
+export default ChartComponent;

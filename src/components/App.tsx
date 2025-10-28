@@ -4,10 +4,19 @@ import "@/index.css";
 import StockChart from "./StockChart";
 import StockTable from "./StockTable";
 import StockTicker from "./StockTicker";
+import StockTransactions from "./StockTransactions";
 import StockHoldings from "./StockHoldings";
+import { useCommsecHoldings } from "@/hooks/useCommsecHoldings";
+import { match } from "@/lib";
+import { ErrorView } from "./Error";
+
+
+const watchList = ["VAP", "ETPMPM"];
 
 export function App() {
   const [daysHistory, setDaysHistory] = useState(20);
+
+  const holdings = useCommsecHoldings({});
 
   return (
     <>
@@ -32,184 +41,42 @@ export function App() {
 
       <div style={{ height: 40 }}></div>
 
-      <div
-        style={{
-          width: "100%",
-          display: "grid",
-          gridTemplateColumns: "33% 33% 33% 33% 33% 33%",
-          gridTemplateRows: "auto",
-          // gridTemplateAreas:
-          //   "ticker ticker ticker"
-          //   "chart chart chart"
-          //   "history history history"
-        }}
-      >
-        <div>
-          <StockTicker
-            initialStockSymbol="IOO"
-            initalBuyPrice={185.295}
-            initialStock={269}
-            history={daysHistory}
-          />
-        </div>
-        <div>
-          <StockTicker
-            initialStockSymbol="VAP"
-            initalBuyPrice={0}
-            initialStock={0}
-            history={daysHistory}
-          />
-        </div>
-        <div>
-          <StockTicker
-            initialStockSymbol="ETPMPM"
-            initalBuyPrice={0}
-            initialStock={0}
-            history={daysHistory}
-          />
-        </div>
-        <div>
-          <StockTicker
-            initialStockSymbol="IOO"
-            initalBuyPrice={185.295}
-            initialStock={269}
-            history={daysHistory}
-          />
-        </div>
-        <div>
-          <StockTicker
-            initialStockSymbol="VAP"
-            initalBuyPrice={0}
-            initialStock={0}
-            history={daysHistory}
-          />
-        </div>
-        <div>
-          <StockTicker
-            initialStockSymbol="ETPMPM"
-            initalBuyPrice={0}
-            initialStock={0}
-            history={daysHistory}
-          />
-        </div>
 
-        <div>
-          <StockHoldings
-            initialStockSymbol="IOO"
-            initalBuyPrice={185.295}
-            initialStock={269}
-            history={daysHistory}
-          />
-        </div>
-        <div>
-          <StockHoldings
-            initialStockSymbol="VAP"
-            initalBuyPrice={0}
-            initialStock={0}
-            history={daysHistory}
-          />
-        </div>
-        <div>
-          <StockHoldings
-            initialStockSymbol="ETPMPM"
-            initalBuyPrice={0}
-            initialStock={0}
-            history={daysHistory}
-          />
-        </div>
-        <div>
-          <StockHoldings
-            initialStockSymbol="IOO"
-            initalBuyPrice={185.295}
-            initialStock={269}
-            history={daysHistory}
-          />
-        </div>
-        <div>
-          <StockHoldings
-            initialStockSymbol="VAP"
-            initalBuyPrice={0}
-            initialStock={0}
-            history={daysHistory}
-          />
-        </div>
-        <div>
-          <StockHoldings
-            initialStockSymbol="ETPMPM"
-            initalBuyPrice={0}
-            initialStock={0}
-            history={daysHistory}
-          />
-        </div>
 
-        <div>
-          <StockChart
-            initialStockSymbol="IOO"
-            initalBuyPrice={185.295}
-            initialStock={269}
-            history={daysHistory}
-          />
-        </div>
-        <div>
-          <StockChart
-            initialStockSymbol="VAP"
-            initalBuyPrice={0}
-            initialStock={0}
-            history={daysHistory}
-          />
-        </div>
-        <div>
-          <StockChart
-            initialStockSymbol="ETPMPM"
-            initalBuyPrice={0}
-            initialStock={0}
-            history={daysHistory}
-          />
-        </div>
-        <div>
-          <StockChart
-            initialStockSymbol="IOO"
-            initalBuyPrice={185.295}
-            initialStock={269}
-            history={daysHistory}
-          />
-        </div>
-        <div>
-          <StockChart
-            initialStockSymbol="VAP"
-            initalBuyPrice={0}
-            initialStock={0}
-            history={daysHistory}
-          />
-        </div>
-        <div>
-          <StockChart
-            initialStockSymbol="ETPMPM"
-            initalBuyPrice={0}
-            initialStock={0}
-            history={daysHistory}
-          />
-        </div>
+        {match(holdings, {
+          init: () => (<>init</>),
+          loading: () => (<>loading</>),
+          value: (v) => {
+            
+            const stockList = [
+              ...v.holdings.map(h => h.code),
+              ...watchList
+            ];
 
-        <div>
-          <StockTable initialStockSymbol="IOO" history={daysHistory} />
-        </div>
-        <div>
-          <StockTable initialStockSymbol="VAP" history={daysHistory} />
-        </div>
-        <div>
-          <StockTable initialStockSymbol="ETPMPM" history={daysHistory} />
-        </div>
-        <div>
-          <StockTable initialStockSymbol="IOO" history={daysHistory} />
-        </div>
-        <div>
-          <StockTable initialStockSymbol="VAP" history={daysHistory} />
-        </div>
-        <div>
-          <StockTable initialStockSymbol="ETPMPM" history={daysHistory} />
-        </div>
-      </div>
+            return (
+              <div
+                style={{
+                  width: "100%",
+                  display: "grid",
+                  gridTemplateColumns: stockList.reduce((pv, cv, ci, arr) => `${pv} 33%`, ""),
+                  gridTemplateRows: "auto",
+                  // gridTemplateAreas:
+                  //   "ticker ticker ticker"
+                  //   "chart chart chart"
+                  //   "history history history"
+                }}
+              >
+                {stockList.map((code) => (<><div><StockTicker initialStockSymbol={code} history={daysHistory} /></div></>))}
+                {stockList.map((code) => (<><div><StockHoldings initialStockSymbol={code} history={daysHistory} /></div></>))}
+                {stockList.map((code) => (<><div><StockTransactions initialStockSymbol={code} history={daysHistory} /></div></>))}
+                {stockList.map((code) => (<><div><StockChart initialStockSymbol={code} history={daysHistory} /></div></>))}
+                {stockList.map((code) => (<><div><StockTable initialStockSymbol={code} history={daysHistory} /></div></>))}
+              </div>
+            );
+          },
+          error: (e) => (<><ErrorView error={e} /></>),
+        })}
+
     </>
   );
 }

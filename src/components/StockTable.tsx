@@ -3,6 +3,9 @@ import client from '@/client';
 import { color, error, init, last, loading, match, pctDiff, toAUD, toDecimalAU, toPercentAU, value, type AsyncResult, type StockSymbol } from '@/lib';
 import React from 'react';
 import type { YahooStockData } from '@/data-loaders/yahoo-finance-charts';
+import { useYahooStock } from '@/hooks/useYahooStock';
+import { useCommsecHoldings } from '@/hooks/useCommsecHoldings';
+import { ErrorView } from './Error';
 
 interface StockTableProps {
     initialStockSymbol: StockSymbol;
@@ -11,39 +14,18 @@ interface StockTableProps {
 
 const StockTable = (props: StockTableProps) => {
 
-  const [asyncState, setAsyncState] = useState<AsyncResult<YahooStockData, Error>>(init<YahooStockData>());
-
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setAsyncState(loading());
-        const response = await client.api.yahoo({ symbol: props.initialStockSymbol }).get();
-        setAsyncState(
-            response.data?.value
-                ? value(response.data.value)
-                : error(new Error("some err"))
-        );
-      } catch (err) {
-        console.error(err);
-        setAsyncState(error(new Error("some err rerrr")));
-      } finally {
-        // setAsyncState("loading");
-      }
-    };
-
-    fetchData();
-  }, []);
-
+  const stocks = useYahooStock({ symbol: props.initialStockSymbol });
+  // const holdings = useCommsecHoldings({});
+  // const transactions = useCommsecTransactions({});
 
   return (<>
           <div style={{border: "5px solid black", margin: "10px", padding:"10px", background: "rgba(0,0,0,0.2)" }}>
-            <h2>{props.initialStockSymbol} {props.history}-Day Trade History</h2>
+            <h2>Yahoo {props.initialStockSymbol} {props.history}-Day Trade History</h2>
 
             {
-                  match(asyncState, {
+                  match(stocks, {
     init: () => <></>,
-    error: (e) => <>{e.message}</>,
+    error: (e) => <ErrorView error={e} />,
     loading: () => <>{props.initialStockSymbol} Loading...</>,
     value: (val) => {
         

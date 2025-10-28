@@ -2,23 +2,24 @@
 import { useState, useEffect, type ChangeEventHandler } from 'react';
 import EChartsReact, { type EChartsOption } from 'echarts-for-react';
 import client from '@/client';
-import { error, init, last, loading, match, symbols, value, type AsyncResult, type StockSymbol } from '@/lib';
+import { error, init, last, loading, match, value, type AsyncResult, type StockSymbol } from '@/lib';
 import type { YahooStockData } from '@/data-loaders/yahoo-finance-charts';
+import { useYahooStock } from '@/hooks/useYahooStock';
+import { useCommsecHoldings } from '@/hooks/useCommsecHoldings';
+import { ErrorView } from './Error';
 
 
-const StockSymbolPicker = ({ value, onChange }: { value: StockSymbol; onChange?: ChangeEventHandler<HTMLSelectElement> }) => (
-    <>
-    <label>StockSymbol: </label>
-    <select value={value} onChange={onChange}>
-        {symbols.map((k) => <option key={k} value={k}>{k}</option>)}
-    </select>
-    </>
-);
+// const StockSymbolPicker = ({ value, onChange }: { value: StockSymbol; onChange?: ChangeEventHandler<HTMLSelectElement> }) => (
+//     <>
+//     <label>StockSymbol: </label>
+//     <select value={value} onChange={onChange}>
+//         {symbols.map((k) => <option key={k} value={k}>{k}</option>)}
+//     </select>
+//     </>
+// );
 
 interface ChartComponentProps {
     initialStockSymbol: StockSymbol;
-    initalBuyPrice: number;
-    initialStock: number;
     history: number;
 }
 
@@ -329,45 +330,30 @@ const toChartOptions = (v: StockDataForChart, buyPrice: number): EChartsOption =
     return option;
 };
 
-const ChartComponent = (props: ChartComponentProps) => {
+const StockChart = (props: ChartComponentProps) => {
 
-  const [symbol, setStockSymbol] = useState<StockSymbol>(props.initialStockSymbol);
-  const [asyncState, setAsyncState] = useState<AsyncResult<YahooStockData, Error>>(init<YahooStockData>());
+  // const [symbol, setStockSymbol] = useState<StockSymbol>(props.initialStockSymbol);
 
-    const [buyPrice, setBuyPrice] = useState<number>(props.initalBuyPrice);
-    const [stockCount, setStockCount] = useState<number>(props.initialStock); 
+  // const [buyPrice, setBuyPrice] = useState<number>(props.initalBuyPrice);
+  // const [stockCount, setStockCount] = useState<number>(props.initialStock); 
 
-    const [stopLossPercentage, setStopLossPercentage] = useState<number>(5); // Default 5% stop loss
+  // const [stopLossPercentage, setStopLossPercentage] = useState<number>(5); // Default 5% stop loss
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setAsyncState(loading());
-        const response = await client.api.yahoo({ symbol }).get();
-        setAsyncState(
-            response.data?.value
-                ? value(response.data.value)
-                : error(new Error("some err"))
-        );
-      } catch (err) {
-        console.error(err);
-        setAsyncState(error(new Error("some err rerrr")));
-      } finally {
-        // setAsyncState("loading");
-      }
-    };
+  const stocks = useYahooStock({ symbol: props.initialStockSymbol });
+  const holdings = useCommsecHoldings({});
+  // const transactions = useCommsecTransactions({});
 
-    fetchData();
-  }, [symbol]);
-
+  const relevantHoldings = holdings.type === "value" ? holdings.value.holdings.filter(x => x.code === props.initialStockSymbol) : [];
+  const buyPrice = relevantHoldings.at(0)?.purchasePrice ?? 0;
+  const stockCount = relevantHoldings.at(0)?.availUnits ?? 0;
 
   return (<>
           <div style={{border: "5px solid black", margin: "10px", padding:"10px", background: "rgba(0,0,0,0.2)" }}>
 
             {
-                  match(asyncState, {
+                  match(stocks, {
     init: () => <></>,
-    error: (e) => <pre>{e.message} {e.name} {e.stack ?? ""}</pre>,
+    error: (e) => <ErrorView error={e} />,
     loading: () => <h2>{props.initialStockSymbol} Loading...</h2>,
     value: (val) => {
         
@@ -388,7 +374,7 @@ const ChartComponent = (props: ChartComponentProps) => {
 
         return (
 <>
-            <h2>{props.initialStockSymbol} {props.history}-Day Candlestick Chart</h2>
+            <h2>Yahoo {props.initialStockSymbol} {props.history}-Day Candlestick Chart</h2>
 
             {/* <StockSymbolPicker value={symbol} onChange={(e) => setStockSymbol(e.target.value as StockSymbol)} />
 
@@ -429,4 +415,4 @@ const ChartComponent = (props: ChartComponentProps) => {
 
 };
 
-export default ChartComponent;
+export default StockChart;

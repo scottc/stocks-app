@@ -1,4 +1,3 @@
-// csvLoader.ts
 import { file } from "bun";
 import { readdir } from "fs/promises";
 import { join } from "path";
@@ -25,7 +24,7 @@ const CACHE_TTL = 60 * 60 * 1000 * 23; // 23 hour in ms
 // Helper: Parse CSV string into array of objects
 function parseCsv(content: string): CommsecTransaction[] {
   const lines = content.trim().split("\n");
-  const headers = lines[0]?.split(",");
+  // const headers = lines[0]?.split(",");
 
   return lines
     .slice(1)
@@ -75,7 +74,7 @@ export async function loadLatestTransactions(): Promise<
     const now = Date.now();
     const cached = csvCache.get(latestFile);
     if (cached && now - cached.timestamp < CACHE_TTL) {
-      console.log(`[Cache] Serving ${latestFile} from memory`);
+      console.log(`[Memory] Serving cached data ${latestFile}`);
       return value(cached.data);
     }
 

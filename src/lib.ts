@@ -72,7 +72,7 @@ function match<T, E, R>(value: AsyncResult<T, E>, body: AsyncResultMatchBody<T, 
     case "loading": return body.loading();
     case "value": return body.value(value.value);
     case "error": return body.error(value.error);
-    default: throw new Error("Unexpected");
+    default: throw new Error(`Unexpected, expected value.type to be one of the following init, loading, value or error, but got 'never', see static type vs runtime object: ${JSON.stringify(value)}.`);
   }
 }
 
@@ -137,8 +137,8 @@ const toUnitAU = (value :number) =>
 const toAUD = (value: number | bigint | Intl.StringNumericLiteral): string => 
   new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD' }).format(value);
 
-export type StockSymbol = "IOO" | "VAP" | "ETPMPM";
-export const symbols: StockSymbol[] = ["IOO", "VAP", "ETPMPM"];
+export type StockSymbol = string;
+// export const symbols: StockSymbol[] = ["IOO", "VAP", "ETPMPM"];
 
 export {
     value,
