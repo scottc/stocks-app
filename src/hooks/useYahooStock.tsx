@@ -1,43 +1,27 @@
-import { useState, useEffect } from "react";
-import {
-  error,
-  init,
-  loading,
-  type AsyncResult,
-} from "@/lib";
+import { useCachedFetch } from "./useCachedFetch";
 import client from "@/client";
-import type { YahooStockData } from "@/data-loaders/yahoo-finance-charts";
+import { DEFAULT_TTL } from "./cache";
 
 interface UseYahooStockOptions {
-  symbol: string
+  symbol: string;
   enabled?: boolean;
+  ttl?: number;
 }
 
 export const useYahooStock = ({
   symbol,
   enabled = true,
-}: UseYahooStockOptions) => {
-  const [asyncState, setAsyncState] =
-    useState<AsyncResult<YahooStockData, Error>>(init<YahooStockData>());
-
-  useEffect(() => {
-    if (!enabled) return;
-
-    const fetchData = async () => {
-      try {
-        setAsyncState(loading());
-        const response = await client.api.yahoo({ symbol }).get();
-        setAsyncState(response.data ?? error(new Error("No data returned from API")));
-      } catch (err) {
-        console.error("Error fetching Yahoo stock data:", err);
-        setAsyncState(
-          error(err instanceof Error ? err : new Error("Unknown error")),
-        );
-      }
-    };
-
-    fetchData();
-  }, [symbol, enabled]);
-
-  return asyncState;
-};
+  ttl = DEFAULT_TTL,
+}: UseYahooStockOptions) => 
+  useCachedFetch(
+    // cache key
+    `client.api.yahoo({ symbol: : ${symbol} })`,
+    // cache task
+    () =>
+      client.api.yahoo({ symbol }).get().then((res) => {
+        if (!res.data) throw new Error("No data");
+        return res.data;
+      }),
+    // options
+    { enabled, ttl }
+  );

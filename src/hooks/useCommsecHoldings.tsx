@@ -1,40 +1,27 @@
-import { useState, useEffect } from "react";
-import {
-  error,
-  init,
-  loading,
-  type AsyncResult,
-} from "@/lib";
+import { useCachedFetch } from "./useCachedFetch";
 import client from "@/client";
-import type { CommsecHoldings } from "@/data-loaders/commsec-holdings";
+import { DEFAULT_TTL } from "./cache";
 
-
-interface UseCommsecHoldings {
+interface UseCommsecHoldingsOptions {
   enabled?: boolean;
+  ttl?: number;
 }
 
-export const useCommsecHoldings = ({enabled = true }: UseCommsecHoldings) => {
-
-  const [asyncState, setAsyncState] = useState<AsyncResult<CommsecHoldings, Error>>(init());
-
-  useEffect(() => {
-    if (!enabled) return;
-
-    const fetchData = async () => {
-      try {
-        setAsyncState(loading());
-        const response = await client.api.commsecholdings.get();
-        setAsyncState(response.data ?? error(new Error("It's null for some reason? see Error.cause for the TreatyResponse object.", { cause: response })));
-      } catch (err) {
-        console.error("Error fetching Yahoo stock data:", err);
-        setAsyncState(
-          error(err instanceof Error ? err : new Error("Unknown error")),
-        );
-      }
-    };
-
-    fetchData();
-  }, [enabled]);
-
-  return asyncState;
+const DEFAULT_OPTS: UseCommsecHoldingsOptions = {
+  enabled: true,
+  ttl: DEFAULT_TTL,
 };
+
+export const useCommsecHoldings = (opts: UseCommsecHoldingsOptions = {}) => 
+  useCachedFetch(
+    // cache key
+    `client.api.commsecholdings()`,
+    // cache task
+    () =>
+      client.api.commsecholdings.get().then((res) => {
+        if (!res.data) throw new Error("No data");
+        return res.data;
+      }),
+    // options
+    { ...DEFAULT_OPTS, ...opts }
+  );

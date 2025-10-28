@@ -1,8 +1,5 @@
-// src/components/ChartComponent.jsx
-import { useState, useEffect, type ChangeEventHandler } from 'react';
 import EChartsReact, { type EChartsOption } from 'echarts-for-react';
-import client from '@/client';
-import { error, init, last, loading, match, value, type AsyncResult, type CrossExchangeTickerSymbol } from '@/lib';
+import { last, match, type CrossExchangeTickerSymbol } from '@/lib';
 import type { YahooStockData } from '@/data-loaders/yahoo-finance-charts';
 import { useYahooStock } from '@/hooks/useYahooStock';
 import { useCommsecHoldings } from '@/hooks/useCommsecHoldings';

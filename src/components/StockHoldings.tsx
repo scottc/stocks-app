@@ -9,7 +9,6 @@ import {
   match,
   type CrossExchangeTickerSymbol,
 } from "@/lib";
-import { useCommsecTransactions } from "@/hooks/useCommsecTransactions";
 import { ErrorView } from "./Error";
 
 

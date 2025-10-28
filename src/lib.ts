@@ -25,8 +25,10 @@ export interface LoadingResult<T, E = Error> {
 
 export type Result<T, E = Error> = ValueResult<T, E> | ErrorResult<T, E>;
 
+// TODO: rename to AsyncState??
 export type AsyncResult<T, E = Error> = InitResult<T, E> | LoadingResult<T, E> | ValueResult<T, E> | ErrorResult<T, E>;
 
+// TODO: rename to errorResult?
 function error<T, E = Error>(error: E): Result<T, E> {
     return ({
         type: "error",
@@ -35,6 +37,7 @@ function error<T, E = Error>(error: E): Result<T, E> {
     });
 }
 
+// TODO: rename to valueResult?
 function value<T, E = Error>(value: T): Result<T, E> {
     return ({
         type: "value",
@@ -43,6 +46,7 @@ function value<T, E = Error>(value: T): Result<T, E> {
     });
 }
 
+// TODO: rename to loadingState?
 function loading<T, E = Error>(): AsyncResult<T, E> {
     return ({
         type: "loading",
@@ -51,6 +55,7 @@ function loading<T, E = Error>(): AsyncResult<T, E> {
     });
 }
 
+// TODO: rename to initState?
 function init<T, E = Error>(): AsyncResult<T, E> {
     return ({
         type: "init",

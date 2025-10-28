@@ -1,10 +1,7 @@
-import { useState, useEffect, type CSSProperties } from 'react';
-import client from '@/client';
-import { color, error, init, last, loading, match, pctDiff, toAUD, toDecimalAU, toPercentAU, value, type AsyncResult, type CrossExchangeTickerSymbol } from '@/lib';
+import { type CSSProperties } from 'react';
+import { color, last, match, pctDiff, toAUD, toDecimalAU, toPercentAU, type CrossExchangeTickerSymbol } from '@/lib';
 import React from 'react';
-import type { YahooStockData } from '@/data-loaders/yahoo-finance-charts';
 import { useYahooStock } from '@/hooks/useYahooStock';
-import { useCommsecHoldings } from '@/hooks/useCommsecHoldings';
 import { ErrorView } from './Error';
 
 interface StockTableProps {

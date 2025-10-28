@@ -1,18 +1,10 @@
-// src/components/ChartComponent.jsx
-import { useState, useEffect, type CSSProperties } from "react";
-import client from "@/client";
+import { type CSSProperties } from "react";
 import {
-  error,
   first,
-  init,
   last,
-  loading,
   match,
-  value,
-  type AsyncResult,
   type CrossExchangeTickerSymbol,
 } from "@/lib";
-import type { YahooStockData } from "@/data-loaders/yahoo-finance-charts";
 import { useYahooStock } from "@/hooks/useYahooStock";
 import { useCommsecHoldings } from "@/hooks/useCommsecHoldings";
 import { ErrorView } from "./Error";

@@ -1,5 +1,4 @@
-// src/components/ChartComponent.jsx
-import { useState, type CSSProperties } from "react";
+import { type CSSProperties } from "react";
 import { useYahooStock } from "@/hooks/useYahooStock";
 import { useCommsecTransactions } from "@/hooks/useCommsecTransactions";
 
