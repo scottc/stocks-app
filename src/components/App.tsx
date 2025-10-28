@@ -7,11 +7,9 @@ import StockTicker from "./StockTicker";
 import StockTransactions from "./StockTransactions";
 import StockHoldings from "./StockHoldings";
 import { useCommsecHoldings } from "@/hooks/useCommsecHoldings";
-import { match } from "@/lib";
+import { match, watchList } from "@/lib";
 import { ErrorView } from "./Error";
-
-
-const watchList = ["VAP", "ETPMPM"];
+import { CommsecLinks } from "./CommsecLinks";
 
 export function App() {
   const [daysHistory, setDaysHistory] = useState(20);
@@ -48,17 +46,12 @@ export function App() {
           loading: () => (<>loading</>),
           value: (v) => {
             
-            const stockList = [
-              ...v.holdings.map(h => h.code),
-              ...watchList
-            ];
-
             return (
               <div
                 style={{
                   width: "100%",
                   display: "grid",
-                  gridTemplateColumns: stockList.reduce((pv, cv, ci, arr) => `${pv} 33%`, ""),
+                  gridTemplateColumns: watchList.reduce((pv, cv, ci, arr) => `${pv} 33%`, ""),
                   gridTemplateRows: "auto",
                   // gridTemplateAreas:
                   //   "ticker ticker ticker"
@@ -66,11 +59,12 @@ export function App() {
                   //   "history history history"
                 }}
               >
-                {stockList.map((code) => (<><div><StockTicker initialStockSymbol={code} history={daysHistory} /></div></>))}
-                {stockList.map((code) => (<><div><StockHoldings initialStockSymbol={code} history={daysHistory} /></div></>))}
-                {stockList.map((code) => (<><div><StockTransactions initialStockSymbol={code} history={daysHistory} /></div></>))}
-                {stockList.map((code) => (<><div><StockChart initialStockSymbol={code} history={daysHistory} /></div></>))}
-                {stockList.map((code) => (<><div><StockTable initialStockSymbol={code} history={daysHistory} /></div></>))}
+                {watchList.map((symbol) => (<div key={symbol.yahoo}><StockTicker symbol={symbol} history={daysHistory} /></div>))}
+                {watchList.map((symbol) => (<div key={symbol.yahoo}><CommsecLinks code={symbol.commsec} /></div>))}
+                {watchList.map((symbol) => (<div key={symbol.yahoo}><StockHoldings symbol={symbol} history={daysHistory} /></div>))}
+                {watchList.map((symbol) => (<div key={symbol.yahoo}><StockTransactions symbol={symbol} history={daysHistory} /></div>))}
+                {watchList.map((symbol) => (<div key={symbol.yahoo}><StockChart symbol={symbol} history={daysHistory} /></div>))}
+                {watchList.map((symbol) => (<div key={symbol.yahoo}><StockTable symbol={symbol} history={daysHistory} /></div>))}
               </div>
             );
           },

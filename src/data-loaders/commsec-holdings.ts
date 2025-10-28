@@ -77,7 +77,7 @@ const parseCSVLine = (line: string): string[] => {
 
 // === Find newest file ===
 async function findNewestHoldingsFile(): Promise<Result<string>> {
-  const dir = join(process.cwd(), 'data', 'holdings');
+  const dir = join(process.cwd(), 'data', 'commsec', 'holdings');
   const files = await readdir(dir);
 
   const csvFiles = files
@@ -93,7 +93,7 @@ async function findNewestHoldingsFile(): Promise<Result<string>> {
     .sort((a, b) => b.time - a.time);
 
   if (csvFiles.length === 0) {
-    return error(new Error('No Holdings_*.csv file found in ./data/holdings/'));
+    return error(new Error('No Holdings_*.csv file found in ./data/commsec/holdings/'));
   }
 
   return value(join(dir, csvFiles[0]?.name ?? ""));

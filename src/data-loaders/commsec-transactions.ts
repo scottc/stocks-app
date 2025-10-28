@@ -3,7 +3,7 @@ import { readdir } from "fs/promises";
 import { join } from "path";
 import { value, error, type Result } from "@/lib";
 
-const TRANSACTIONS_DIR = join(process.cwd(), "data", "transactions");
+const TRANSACTIONS_DIR = join(process.cwd(), "data", "commsec", "transactions");
 
 export interface CommsecTransaction {
   date: string;

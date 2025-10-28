@@ -7,14 +7,14 @@ import {
   first,
   last,
   match,
-  type StockSymbol,
+  type CrossExchangeTickerSymbol,
 } from "@/lib";
 import { useCommsecTransactions } from "@/hooks/useCommsecTransactions";
 import { ErrorView } from "./Error";
 
 
 interface ChartComponentProps {
-  initialStockSymbol: StockSymbol;
+  symbol: CrossExchangeTickerSymbol;
   history: number;
 }
 
@@ -24,15 +24,15 @@ const style: CSSProperties = {
 };
 
 const StockHoldings = ({
-  initialStockSymbol,
+  symbol,
   history
 }: ChartComponentProps) => {
 
-  const stocks = useYahooStock({ symbol: initialStockSymbol });
+  const stocks = useYahooStock({ symbol: symbol.yahoo });
   const holdings = useCommsecHoldings({});
   // const transactions = useCommsecTransactions({});
 
-  const relevantHoldings = holdings.type === "value" ? holdings.value.holdings.filter(x => x.code === initialStockSymbol) : [];
+  const relevantHoldings = holdings.type === "value" ? holdings.value.holdings.filter(x => x.code === symbol.commsec) : [];
   const purchasePrice = relevantHoldings.at(0)?.purchasePrice ?? 0;
   const availUnits = relevantHoldings.at(0)?.availUnits ?? 0;
 
@@ -45,14 +45,14 @@ const StockHoldings = ({
         background: "rgba(0,0,0,0.2)",
       }}
     >
-      <h2>Commsec {initialStockSymbol} Holdings</h2>
+      <h2>Commsec {symbol.commsec} Holdings</h2>
 
       {match(holdings, {
         init: () => (<></>),
         loading: () => (<></>),
         value: (v) => {
           
-          const relevant = v.holdings.filter(x => x.code === initialStockSymbol);
+          const relevant = v.holdings.filter(x => x.code === symbol.commsec);
 
           return (<>
 
@@ -67,7 +67,7 @@ const StockHoldings = ({
             </thead>
             <tbody>
               {relevant.map((h) => (
-                <tr>
+                <tr key={h.code} /* TODO: is this key unique? */>
                   <td>{h.availUnits}</td>
                   <td>{h.purchasePrice}</td>
                 </tr>
@@ -82,7 +82,7 @@ const StockHoldings = ({
       {match(stocks, {
         init: () => <></>,
         error: (e) => (<ErrorView error={e} />),
-        loading: () => <>{initialStockSymbol} Loading...</>,
+        loading: () => <>{symbol.commsec} Loading...</>,
         value: (val) => {
           const r = val.chart.result[0];
           const q = first(r?.indicators.quote);
@@ -105,14 +105,6 @@ const StockHoldings = ({
                   href="https://www2.commsec.com.au/Portfolio/holdings"
                 >
                   Holdings
-                </a>
-                {" | "}
-                <a
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  href="https://www2.commsec.com.au/Portfolio/transactions"
-                >
-                  Transactions
                 </a>
               </p>
             </>

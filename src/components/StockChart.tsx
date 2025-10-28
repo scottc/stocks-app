@@ -2,7 +2,7 @@
 import { useState, useEffect, type ChangeEventHandler } from 'react';
 import EChartsReact, { type EChartsOption } from 'echarts-for-react';
 import client from '@/client';
-import { error, init, last, loading, match, value, type AsyncResult, type StockSymbol } from '@/lib';
+import { error, init, last, loading, match, value, type AsyncResult, type CrossExchangeTickerSymbol } from '@/lib';
 import type { YahooStockData } from '@/data-loaders/yahoo-finance-charts';
 import { useYahooStock } from '@/hooks/useYahooStock';
 import { useCommsecHoldings } from '@/hooks/useCommsecHoldings';
@@ -19,7 +19,7 @@ import { ErrorView } from './Error';
 // );
 
 interface ChartComponentProps {
-    initialStockSymbol: StockSymbol;
+    symbol: CrossExchangeTickerSymbol;
     history: number;
 }
 
@@ -86,7 +86,7 @@ function calculateMA(dayCount: number, data: StockDataForChart) {
 
       sum += data.values[i - j]?.[1] ?? 0;
     }
-    result.push(+(sum / dayCount).toFixed(3));
+    result.push(+(sum / dayCount));
   }
   return result;
 }
@@ -339,11 +339,11 @@ const StockChart = (props: ChartComponentProps) => {
 
   // const [stopLossPercentage, setStopLossPercentage] = useState<number>(5); // Default 5% stop loss
 
-  const stocks = useYahooStock({ symbol: props.initialStockSymbol });
+  const stocks = useYahooStock({ symbol: props.symbol.yahoo });
   const holdings = useCommsecHoldings({});
   // const transactions = useCommsecTransactions({});
 
-  const relevantHoldings = holdings.type === "value" ? holdings.value.holdings.filter(x => x.code === props.initialStockSymbol) : [];
+  const relevantHoldings = holdings.type === "value" ? holdings.value.holdings.filter(x => x.code === props.symbol.commsec) : [];
   const buyPrice = relevantHoldings.at(0)?.purchasePrice ?? 0;
   const stockCount = relevantHoldings.at(0)?.availUnits ?? 0;
 
@@ -354,7 +354,7 @@ const StockChart = (props: ChartComponentProps) => {
                   match(stocks, {
     init: () => <></>,
     error: (e) => <ErrorView error={e} />,
-    loading: () => <h2>{props.initialStockSymbol} Loading...</h2>,
+    loading: () => <h2>{props.symbol.commsec} Loading...</h2>,
     value: (val) => {
         
         // TODO: this is probably expensive to render... consider precalculating.
@@ -374,7 +374,7 @@ const StockChart = (props: ChartComponentProps) => {
 
         return (
 <>
-            <h2>Yahoo {props.initialStockSymbol} {props.history}-Day Candlestick Chart</h2>
+            <h2>Yahoo {props.symbol.yahoo} {props.history}-Day Candlestick Chart</h2>
 
             {/* <StockSymbolPicker value={symbol} onChange={(e) => setStockSymbol(e.target.value as StockSymbol)} />
 
@@ -400,6 +400,13 @@ const StockChart = (props: ChartComponentProps) => {
             /> */}
 
             <EChartsReact option={toChartOptions(toChartData(val, props.history), buyPrice)} style={{ height: 400, width: '100%' }} />
+
+
+              <p>
+                Yahoo
+                {" | "}
+                <a target="_blank" href={`https://finance.yahoo.com/chart/${props.symbol.yahoo}`}>Chart</a>
+              </p>
 
             </>
 

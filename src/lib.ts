@@ -137,23 +137,58 @@ const toUnitAU = (value :number) =>
 const toAUD = (value: number | bigint | Intl.StringNumericLiteral): string => 
   new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD' }).format(value);
 
-export type StockSymbol = string;
-// export const symbols: StockSymbol[] = ["IOO", "VAP", "ETPMPM"];
+/**
+ * Yahoo:
+ * Indexes are prefixed with: ^
+ * Australian Exchange Ticker Symbols are suffixed with: .AX
+ * 
+ * Commsec:
+ * Ticker Symbols are called stockCode & exchangeCode.
+ */
+export interface CrossExchangeTickerSymbol {
+  commsec: string;
+  yahoo: string;
+}
+
+const watchList: CrossExchangeTickerSymbol[] = [
+  {
+    commsec: "IOO",
+    yahoo: "IOO.AX",
+  },
+  {
+    commsec: "XJO",
+    yahoo: "^AXJO",
+  },
+  {
+    commsec: "VAP",
+    yahoo: "VAP.AX",
+  },
+  {
+    commsec: "ETPMPM",
+    yahoo: "ETPMPM.AX",
+  },
+  {
+    commsec: "VAS",
+    yahoo: "VAS.AX",
+  }
+];
+
 
 export {
-    value,
-    error,
-    loading,
-    init,
-    match,
-    first,
-    last,
-    previous,
-    pctDiff,
-    toAUD,
-    toDecimalAU,
-    toPercentAU,
-    toUnitAU,
-    color,
-    icon
+  watchList,
+  value,
+  error,
+  loading,
+  init,
+  match,
+  first,
+  last,
+  previous,
+  pctDiff,
+  toAUD,
+  toDecimalAU,
+  toPercentAU,
+  toUnitAU,
+  color,
+  icon,
 };

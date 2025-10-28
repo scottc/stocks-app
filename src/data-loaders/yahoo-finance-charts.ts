@@ -68,7 +68,7 @@ export interface YahooQuote {
     open: number[];
 }
 
-const CACHE_DIR = join(process.cwd(), "data", "cache");
+const CACHE_DIR = join(process.cwd(), "data", "yahoo", "charts");
 
 /** Cache time-to-live (TTL) in 3600 seconds = 1 hour x 23 hours */
 const CACHE_TTL = 3600 * 23;
@@ -79,11 +79,11 @@ const memoryCache = new Map<
 >();
 
 const yahooApiFetch = async (
-  symbol: string,
+  yahooSymbol: string,
 ): Promise<Result<YahooStockData>> => {
   try {
-    if (symbol === "unknown") {
-      console.log(symbol);
+    if (yahooSymbol === "unknown") {
+      console.log(yahooSymbol);
       // console.log(JSON.stringify(params, null, 2));
       throw new Error("unhandled");
     }
@@ -91,13 +91,13 @@ const yahooApiFetch = async (
     const now = Math.floor(Date.now() / 1000); // Current Unix timestamp (seconds)
 
     // 1. Check in-memory cache (exact symbol)
-    const memEntry = memoryCache.get(symbol);
+    const memEntry = memoryCache.get(yahooSymbol);
     if (memEntry && now - memEntry.timestamp <= CACHE_TTL) {
-      console.log(`[Memory] Serving cached data for ${symbol}`);
+      console.log(`[Memory] Serving cached data for ${yahooSymbol}`);
       return value(memEntry.data);
     }
 
-    const cacheSubDir = join(CACHE_DIR, symbol);
+    const cacheSubDir = join(CACHE_DIR, yahooSymbol);
 
     // Ensure ticker directory exists
     mkdirSync(cacheSubDir, { recursive: true });
@@ -118,17 +118,17 @@ const yahooApiFetch = async (
         const cacheFile = file(cacheFilePath);
         if (await cacheFile.exists()) {
           console.log(
-            `[Disk] Serving cached data for ${symbol} from ${cacheFilePath}`,
+            `[Disk] Serving cached data for ${yahooSymbol} from ${cacheFilePath}`,
           );
 
           const cachedData: YahooStockData = await cacheFile.json();
 
           // Populate in-memory cache on disk hit
-          memoryCache.set(symbol, {
+          memoryCache.set(yahooSymbol, {
             data: cachedData,
             timestamp: cacheTimestamp,
           });
-          console.log(`[Memory] Cached data for ${symbol}`);
+          console.log(`[Memory] Cached data for ${yahooSymbol}`);
 
           return value(cachedData);
         }
@@ -136,8 +136,8 @@ const yahooApiFetch = async (
     }
 
     // No valid cache; fetch from Yahoo Finance
-    const yahooUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}.AX?period1=0&period2=9999999999&interval=1d&includePrePost=false&events=div%7Csplit`;
-    console.log(`Fetching from Yahoo Finance: ${yahooUrl}`);
+    const yahooUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${yahooSymbol}?period1=0&period2=9999999999&interval=1d&includePrePost=false&events=div%7Csplit`;
+    console.log(`[Network] Fetching from Yahoo Finance: ${yahooUrl}`);
     const response = await fetch(yahooUrl, {
       headers: {
         "User-Agent": "Bun/1.1.35",
@@ -155,11 +155,11 @@ const yahooApiFetch = async (
     const timestamp = Math.floor(Date.now() / 1000);
     const cacheFilePath = join(cacheSubDir, `${timestamp}.json`);
     await write(file(cacheFilePath), JSON.stringify(data));
-    console.log(`[Disk] Cached data to ${cacheFilePath}`);
+    console.log(`[Disk] Cached yahoo data to ${cacheFilePath}`);
 
     // Save to in-memory cache
-    memoryCache.set(symbol, { data, timestamp });
-    console.log(`[Memory] Cached data for ${symbol}`);
+    memoryCache.set(yahooSymbol, { data, timestamp });
+    console.log(`[Memory] Cached yahoo data for ${yahooSymbol}`);
 
     return value(data);
   } catch (err) {

@@ -10,7 +10,7 @@ import {
   match,
   value,
   type AsyncResult,
-  type StockSymbol,
+  type CrossExchangeTickerSymbol,
 } from "@/lib";
 import type { YahooStockData } from "@/data-loaders/yahoo-finance-charts";
 import { useYahooStock } from "@/hooks/useYahooStock";
@@ -18,17 +18,17 @@ import { useCommsecHoldings } from "@/hooks/useCommsecHoldings";
 import { ErrorView } from "./Error";
 
 interface ChartComponentProps {
-  initialStockSymbol: StockSymbol;
+  symbol: CrossExchangeTickerSymbol;
   history: number;
 }
 
-const ChartComponent = ({ history, initialStockSymbol }: ChartComponentProps) => {
+const ChartComponent = ({ history, symbol }: ChartComponentProps) => {
 
-  const stocks = useYahooStock({ symbol: initialStockSymbol });
+  const stocks = useYahooStock({ symbol: symbol.yahoo });
   const holdings = useCommsecHoldings({});
   // const transactions = useCommsecTransactions({});
 
-  const relevantHoldings = holdings.type === "value" ? holdings.value.holdings.filter(x => x.code === initialStockSymbol) : [];
+  const relevantHoldings = holdings.type === "value" ? holdings.value.holdings.filter(x => x.code === symbol.commsec) : [];
   const purchasePrice = relevantHoldings.at(0)?.purchasePrice ?? 0;
   const availUnits = relevantHoldings.at(0)?.availUnits ?? 0;
 
@@ -42,12 +42,12 @@ const ChartComponent = ({ history, initialStockSymbol }: ChartComponentProps) =>
           background: "rgba(0,0,0,0.2)",
         }}
       >
-        <h2>Yahoo {initialStockSymbol} Information</h2>
+        <h2>Yahoo {symbol.yahoo} Information</h2>
 
         {match(stocks, {
           init: () => <></>,
           error: (e) => (<ErrorView error={e} />),
-          loading: () => <>{initialStockSymbol} Loading...</>,
+          loading: () => <>{symbol.yahoo} Loading...</>,
           value: (val) => {
             const r = val.chart.result[0];
 
@@ -229,9 +229,9 @@ const ChartComponent = ({ history, initialStockSymbol }: ChartComponentProps) =>
                   Commsec{" | "}
                   <a
                     target="_blank"
-                    href={`https://www2.commsec.com.au/Quotes?stockCode=${initialStockSymbol}&exchangeCode=ASX`}
+                    href={`https://www2.commsec.com.au/Quotes?stockCode=${symbol.commsec}&exchangeCode=ASX`}
                   >
-                    {initialStockSymbol} Quotes
+                    {symbol.commsec} Quotes
                   </a>
                 </p>
               </>
