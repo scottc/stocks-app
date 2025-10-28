@@ -5,46 +5,46 @@ import { readdir } from "fs/promises";
 import { error, value, type Result } from "@/lib";
 
 export interface YahooStockData {
-    chart: YahooChart;
+  chart: YahooChart;
 }
 
 export interface YahooChart {
-    result: YahooChartResultItem[];
-    error: null;
+  result: YahooChartResultItem[];
+  error: null;
 }
 
 export interface YahooChartResultItem {
-    meta: YahooMeta;
-    timestamp: number[];
-    indicators: YahooChartIndicators;
+  meta: YahooMeta;
+  timestamp: number[];
+  indicators: YahooChartIndicators;
 }
 
 export interface YahooMeta {
-    currency: any;
-    symbol: string;
-    exchangeName: any;
-    fullExchangeName: any;
-    instrumentType: any;
-    firstTradeDate: any;
-    regularMarketTime: any;
-    hasPrePostMarketData: any;
-    gmtoffset: any;
-    timezone: any;
-    exchangeTimezoneName: any;
-    regularMarketPrice: any;
-    fiftyTwoWeekHigh: any;
-    fiftyTwoWeekLow: any;
-    regularMarketDayHigh: any;
-    regularMarketDayLow: any;
-    regularMarketVolume: any;
-    longName: string;
-    shortName: string;
-    chartPreviousClose: any;
-    priceHint: any;
-    currentTradingPeriod: TradingPeriods;
-    dataGranularity: any;
-    range: any;
-    validRanges: any; 
+  currency: unknown;
+  symbol: string;
+  exchangeName: string;
+  fullExchangeName: string;
+  instrumentType: string;
+  firstTradeDate: unknown;
+  regularMarketTime: unknown;
+  hasPrePostMarketData: unknown;
+  gmtoffset: unknown;
+  timezone: string;
+  exchangeTimezoneName: string;
+  regularMarketPrice: unknown;
+  fiftyTwoWeekHigh: unknown;
+  fiftyTwoWeekLow: unknown;
+  regularMarketDayHigh: unknown;
+  regularMarketDayLow: unknown;
+  regularMarketVolume: unknown;
+  longName: string;
+  shortName: string;
+  chartPreviousClose: unknown;
+  priceHint: unknown;
+  currentTradingPeriod: TradingPeriods;
+  dataGranularity: unknown;
+  range: unknown;
+  validRanges: unknown;
 }
 
 export interface TradingPeriods {
@@ -53,19 +53,24 @@ export interface TradingPeriods {
   post: TradingHours;
 }
 
-export interface TradingHours { timezone: string, start: number, end:number, gmtoffset: number }
+export interface TradingHours {
+  timezone: string;
+  start: number;
+  end: number;
+  gmtoffset: number;
+}
 
 export interface YahooChartIndicators {
-    quote: YahooQuote[];
-    adjclose: number[];
+  quote: YahooQuote[];
+  adjclose: number[];
 }
 
 export interface YahooQuote {
-    high: number[];
-    volume: number[];
-    close: number[];
-    low: number[];
-    open: number[];
+  high: number[];
+  volume: number[];
+  close: number[];
+  low: number[];
+  open: number[];
 }
 
 const CACHE_DIR = join(process.cwd(), "data", "yahoo", "charts");

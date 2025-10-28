@@ -2,15 +2,9 @@ import { type CSSProperties } from "react";
 import { useYahooStock } from "@/hooks/useYahooStock";
 import { useCommsecTransactions } from "@/hooks/useCommsecTransactions";
 
-import {
-  first,
-  last,
-  match,
-  type CrossExchangeTickerSymbol,
-} from "@/lib";
-import { useCommsecHoldings } from "@/hooks/useCommsecHoldings";
+import { match, type CrossExchangeTickerSymbol } from "@/lib";
+//import { useCommsecHoldings } from "@/hooks/useCommsecHoldings";
 import { ErrorView } from "./Error";
-
 
 interface ChartComponentProps {
   symbol: CrossExchangeTickerSymbol;
@@ -24,16 +18,18 @@ const style: CSSProperties = {
 
 const ChartComponent = ({
   symbol,
-  history
+  //history
 }: ChartComponentProps) => {
-
   const stocks = useYahooStock({ symbol: symbol.yahoo });
-  const holdings = useCommsecHoldings({});
+  //const holdings = useCommsecHoldings({});
   const transactions = useCommsecTransactions({});
 
-  const relevantHoldings = holdings.type === "value" ? holdings.value.holdings.filter(x => x.code === symbol.commsec) : [];
-  const purchasePrice = relevantHoldings.at(0)?.purchasePrice ?? 0;
-  const availUnits = relevantHoldings.at(0)?.availUnits ?? 0;
+  //const relevantHoldings =
+  //  holdings.type === "value"
+  //    ? holdings.value.holdings.filter((x) => x.code === symbol.commsec)
+  //    : [];
+  //const purchasePrice = relevantHoldings.at(0)?.purchasePrice ?? 0;
+  //const availUnits = relevantHoldings.at(0)?.availUnits ?? 0;
 
   return (
     <div
@@ -47,57 +43,58 @@ const ChartComponent = ({
       <h2>Commsec {symbol.commsec} Transactions</h2>
 
       {match(transactions, {
-        init: () => (<></>),
-        loading: () => (<></>),
+        init: () => <></>,
+        loading: () => <></>,
         value: (v) => {
-          
-          const relevant = v.filter(x => x.details.includes(symbol.commsec));
+          const relevant = v.filter((x) => x.details.includes(symbol.commsec));
 
-          return (<>
-          <table style={style}>
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Reference</th>
-                <th>Details</th>
-                <th>Debit</th>
-                <th>Credit</th>
-                <th>Balance</th>
-              </tr>
-            </thead>
-            <tbody>
-              {relevant.map((t) => (
-                <tr key={t.reference}>
-                  <td>{t.date}</td>
-                  <td>{t.reference}</td>
-                  <td>{t.details}</td>
-                  <td>{t.debit}</td>
-                  <td>{t.credit}</td>
-                  <td>{t.balance}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </>);
+          return (
+            <>
+              <table style={style}>
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Reference</th>
+                    <th>Details</th>
+                    <th>Debit</th>
+                    <th>Credit</th>
+                    <th>Balance</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {relevant.map((t) => (
+                    <tr key={t.reference}>
+                      <td>{t.date}</td>
+                      <td>{t.reference}</td>
+                      <td>{t.details}</td>
+                      <td>{t.debit}</td>
+                      <td>{t.credit}</td>
+                      <td>{t.balance}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </>
+          );
         },
-        error: (e) => (<ErrorView error={e} />),
+        error: (e) => <ErrorView error={e} />,
       })}
 
       {match(stocks, {
         init: () => <></>,
-        error: (e) => (<ErrorView error={e} />),
+        error: (e) => <ErrorView error={e} />,
         loading: () => <>{symbol.commsec} Loading...</>,
-        value: (val) => {
-          const r = val.chart.result[0];
-          const q = first(r?.indicators.quote);
-          const meta = r?.meta;
-          const currentPrice = last(q?.close) ?? 0;
-          const profit = (currentPrice - purchasePrice) * availUnits;
+        value: () => {
+          //const r = val.chart.result[0];
+          //const q = first(r?.indicators.quote);
+          //const meta = r?.meta;
+          //const currentPrice = last(q?.close) ?? 0;
+          //const profit = (currentPrice - purchasePrice) * availUnits;
 
-          const style: CSSProperties = {
-            border: "2px solid rgb(140 140 140)",
-            borderCollapse: "collapse",
-          };
+          //const style: CSSProperties = {
+          //  border: "2px solid rgb(140 140 140)",
+          //  borderCollapse: "collapse",
+          //};
 
           return (
             <>

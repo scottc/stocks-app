@@ -4,16 +4,16 @@ type Pending<T> = Promise<T>;
 
 export const DEFAULT_TTL = 23 * 60 * 60 * 1000; // 23 hours in milliseconds
 
-class TinyCache {
-  private cache = new Map<string, CacheEntry<any>>();
-  private pending = new Map<string, Pending<any>>();
+class TinyCache<K, V> {
+  private cache = new Map<K, CacheEntry<V>>();
+  private pending = new Map<K, Pending<V>>();
 
   /** Get or fetch with deduplication */
-  async getOrFetch<T>(
-    key: string,
-    fetchFn: () => Promise<T>,
-    ttl: number = DEFAULT_TTL
-  ): Promise<T> {
+  async getOrFetch(
+    key: K,
+    fetchFn: () => Promise<V>,
+    ttl: number = DEFAULT_TTL,
+  ): Promise<V> {
     const now = Date.now();
 
     // 1. Return cached value if fresh
@@ -25,7 +25,10 @@ class TinyCache {
 
     // 2. Deduplicate in-flight requests
     if (this.pending.has(key)) {
-      console.log(`[Memory] duplicate pending inflight request, referencing previous request:`, key);
+      console.log(
+        `[Memory] duplicate pending inflight request, referencing previous request:`,
+        key,
+      );
       return this.pending.get(key)!;
     }
 
@@ -41,14 +44,13 @@ class TinyCache {
         throw err;
       });
 
-
     console.log("[Network] fetching:", key);
     this.pending.set(key, promise);
     return promise;
   }
 
   /** Manual invalidate */
-  invalidate(key?: string) {
+  invalidate(key?: K) {
     if (key) {
       this.cache.delete(key);
       this.pending.delete(key);

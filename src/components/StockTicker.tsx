@@ -1,12 +1,6 @@
-import { type CSSProperties } from "react";
-import {
-  first,
-  last,
-  match,
-  type CrossExchangeTickerSymbol,
-} from "@/lib";
+import { match, type CrossExchangeTickerSymbol } from "@/lib";
 import { useYahooStock } from "@/hooks/useYahooStock";
-import { useCommsecHoldings } from "@/hooks/useCommsecHoldings";
+//import { useCommsecHoldings } from "@/hooks/useCommsecHoldings";
 import { ErrorView } from "./Error";
 
 interface ChartComponentProps {
@@ -14,15 +8,17 @@ interface ChartComponentProps {
   history: number;
 }
 
-const ChartComponent = ({ history, symbol }: ChartComponentProps) => {
-
+const ChartComponent = ({ symbol }: ChartComponentProps) => {
   const stocks = useYahooStock({ symbol: symbol.yahoo });
-  const holdings = useCommsecHoldings({});
+  //const holdings = useCommsecHoldings({});
   // const transactions = useCommsecTransactions({});
 
-  const relevantHoldings = holdings.type === "value" ? holdings.value.holdings.filter(x => x.code === symbol.commsec) : [];
-  const purchasePrice = relevantHoldings.at(0)?.purchasePrice ?? 0;
-  const availUnits = relevantHoldings.at(0)?.availUnits ?? 0;
+  //const relevantHoldings =
+  //  holdings.type === "value"
+  //    ? holdings.value.holdings.filter((x) => x.code === symbol.commsec)
+  //    : [];
+  //const purchasePrice = relevantHoldings.at(0)?.purchasePrice ?? 0;
+  //const availUnits = relevantHoldings.at(0)?.availUnits ?? 0;
 
   return (
     <>
@@ -38,19 +34,19 @@ const ChartComponent = ({ history, symbol }: ChartComponentProps) => {
 
         {match(stocks, {
           init: () => <></>,
-          error: (e) => (<ErrorView error={e} />),
+          error: (e) => <ErrorView error={e} />,
           loading: () => <>{symbol.yahoo} Loading...</>,
           value: (val) => {
-            const r = val.chart.result[0];
+            //const r = val.chart.result[0];
 
-            const q = first(r?.indicators.quote);
+            //const q = first(r?.indicators.quote);
             const meta = val.chart.result[0]?.meta;
-            const profit = ((last(q?.close) ?? 0) - purchasePrice) * availUnits;
+            //const profit = ((last(q?.close) ?? 0) - purchasePrice) * availUnits;
 
-            const style: CSSProperties = {
-              border: "2px solid rgb(140 140 140)",
-              borderCollapse: "collapse",
-            };
+            //const style: CSSProperties = {
+            //  border: "2px solid rgb(140 140 140)",
+            //  borderCollapse: "collapse",
+            //};
 
             return (
               <>

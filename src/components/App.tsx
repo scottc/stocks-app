@@ -39,38 +39,62 @@ export function App() {
 
       <div style={{ height: 40 }}></div>
 
-
-
-        {match(holdings, {
-          init: () => (<>init</>),
-          loading: () => (<>loading</>),
-          value: (v) => {
-            
-            return (
-              <div
-                style={{
-                  width: "100%",
-                  display: "grid",
-                  gridTemplateColumns: watchList.reduce((pv, cv, ci, arr) => `${pv} 33%`, ""),
-                  gridTemplateRows: "auto",
-                  // gridTemplateAreas:
-                  //   "ticker ticker ticker"
-                  //   "chart chart chart"
-                  //   "history history history"
-                }}
-              >
-                {watchList.map((symbol) => (<div key={symbol.yahoo}><StockTicker symbol={symbol} history={daysHistory} /></div>))}
-                {watchList.map((symbol) => (<div key={symbol.yahoo}><CommsecLinks code={symbol.commsec} /></div>))}
-                {watchList.map((symbol) => (<div key={symbol.yahoo}><StockHoldings symbol={symbol} history={daysHistory} /></div>))}
-                {watchList.map((symbol) => (<div key={symbol.yahoo}><StockTransactions symbol={symbol} history={daysHistory} /></div>))}
-                {watchList.map((symbol) => (<div key={symbol.yahoo}><StockChart symbol={symbol} history={daysHistory} /></div>))}
-                {watchList.map((symbol) => (<div key={symbol.yahoo}><StockTable symbol={symbol} history={daysHistory} /></div>))}
-              </div>
-            );
-          },
-          error: (e) => (<><ErrorView error={e} /></>),
-        })}
-
+      {match(holdings, {
+        init: () => <>init</>,
+        loading: () => <>loading</>,
+        value: () => {
+          return (
+            <div
+              style={{
+                width: "100%",
+                display: "grid",
+                gridTemplateColumns: watchList.reduce((pv) => `${pv} 33%`, ""),
+                gridTemplateRows: "auto",
+                // gridTemplateAreas:
+                //   "ticker ticker ticker"
+                //   "chart chart chart"
+                //   "history history history"
+              }}
+            >
+              {watchList.map((symbol) => (
+                <div key={symbol.yahoo}>
+                  <StockTicker symbol={symbol} history={daysHistory} />
+                </div>
+              ))}
+              {watchList.map((symbol) => (
+                <div key={symbol.yahoo}>
+                  <CommsecLinks code={symbol.commsec} />
+                </div>
+              ))}
+              {watchList.map((symbol) => (
+                <div key={symbol.yahoo}>
+                  <StockHoldings symbol={symbol} history={daysHistory} />
+                </div>
+              ))}
+              {watchList.map((symbol) => (
+                <div key={symbol.yahoo}>
+                  <StockTransactions symbol={symbol} history={daysHistory} />
+                </div>
+              ))}
+              {watchList.map((symbol) => (
+                <div key={symbol.yahoo}>
+                  <StockChart symbol={symbol} history={daysHistory} />
+                </div>
+              ))}
+              {watchList.map((symbol) => (
+                <div key={symbol.yahoo}>
+                  <StockTable symbol={symbol} history={daysHistory} />
+                </div>
+              ))}
+            </div>
+          );
+        },
+        error: (e) => (
+          <>
+            <ErrorView error={e} />
+          </>
+        ),
+      })}
     </>
   );
 }

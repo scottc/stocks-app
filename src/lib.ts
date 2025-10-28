@@ -1,67 +1,72 @@
-export interface ValueResult<T, E> {
-    type: "value";
-    value: T;
-    error: undefined;
+export interface ValueResult<T /* , E = Error*/> {
+  type: "value";
+  value: T;
+  error: undefined;
 }
 
-export interface ErrorResult<T, E = Error> {
-    type: "error";
-    value: undefined;
-    error: E;
+export interface ErrorResult</*T,*/ E = Error> {
+  type: "error";
+  value: undefined;
+  error: E;
 }
 
-export interface InitResult<T, E = Error> {
-    type: "init";
-    value: undefined;
-    error: undefined;
+export interface InitResult /*<T, E = Error>*/ {
+  type: "init";
+  value: undefined;
+  error: undefined;
 }
 
-export interface LoadingResult<T, E = Error> {
-    type: "loading";
-    value: undefined;
-    error: undefined;
+export interface LoadingResult /*<T, E = Error>*/ {
+  type: "loading";
+  value: undefined;
+  error: undefined;
 }
 
-
-export type Result<T, E = Error> = ValueResult<T, E> | ErrorResult<T, E>;
+export type Result<T, E = Error> =
+  | ValueResult<T /*, E*/>
+  | ErrorResult</*T, */ E>;
 
 // TODO: rename to AsyncState??
-export type AsyncResult<T, E = Error> = InitResult<T, E> | LoadingResult<T, E> | ValueResult<T, E> | ErrorResult<T, E>;
+export type AsyncResult<T, E = Error> =
+  | InitResult //<T, E>
+  | LoadingResult //<T, E>
+  | ValueResult<T /*, E*/>
+  | ErrorResult</*T, */ E>;
 
 // TODO: rename to errorResult?
 function error<T, E = Error>(error: E): Result<T, E> {
-    return ({
-        type: "error",
-        error: error,
-        value: undefined,
-    });
+  return {
+    type: "error",
+    error: error,
+    value: undefined,
+  };
 }
 
 // TODO: rename to valueResult?
 function value<T, E = Error>(value: T): Result<T, E> {
-    return ({
-        type: "value",
-        value: value,
-        error: undefined,
-    });
+  return {
+    type: "value",
+    value: value,
+    error: undefined,
+  };
 }
 
 // TODO: rename to loadingState?
 function loading<T, E = Error>(): AsyncResult<T, E> {
-    return ({
-        type: "loading",
-        value: undefined,
-        error: undefined,
-    });
+  return {
+    type: "loading",
+    value: undefined,
+    error: undefined,
+  };
 }
 
 // TODO: rename to initState?
 function init<T, E = Error>(): AsyncResult<T, E> {
-    return ({
-        type: "init",
-        value: undefined,
-        error: undefined,
-    });
+  return {
+    type: "init",
+    value: undefined,
+    error: undefined,
+  };
 }
 
 interface AsyncResultMatchBody<T, E, R> {
@@ -71,13 +76,23 @@ interface AsyncResultMatchBody<T, E, R> {
   value: (v: T) => R;
 }
 
-function match<T, E, R>(value: AsyncResult<T, E>, body: AsyncResultMatchBody<T, E, R>  ): R {
-  switch(value.type) {
-    case "init": return body.init();
-    case "loading": return body.loading();
-    case "value": return body.value(value.value);
-    case "error": return body.error(value.error);
-    default: throw new Error(`Unexpected, expected value.type to be one of the following init, loading, value or error, but got 'never', see static type vs runtime object: ${JSON.stringify(value)}.`);
+function match<T, E, R>(
+  value: AsyncResult<T, E>,
+  body: AsyncResultMatchBody<T, E, R>,
+): R {
+  switch (value.type) {
+    case "init":
+      return body.init();
+    case "loading":
+      return body.loading();
+    case "value":
+      return body.value(value.value);
+    case "error":
+      return body.error(value.error);
+    default:
+      throw new Error(
+        `Unexpected, expected value.type to be one of the following init, loading, value or error, but got 'never', see static type vs runtime object: ${JSON.stringify(value)}.`,
+      );
   }
 }
 
@@ -96,21 +111,21 @@ function previous<T>(arr: T[] | undefined, index: number): T | undefined {
 function pctDiff(close: number, open: number): number {
   if (open === 0) {
     return 0;
-      //throw new Error("Cannot calculate percentage change with zero open price.");
+    //throw new Error("Cannot calculate percentage change with zero open price.");
   }
-  
-  return ((close - open) / open);
+
+  return (close - open) / open;
 }
 
 const up = "▲";
-const eq = "▶"
+const eq = "▶";
 const down = "▼";
 
-const upColor = '#00da3c';
-const eqColor = '#ecda3c';
-const downColor = '#ec0000';
+const upColor = "#00da3c";
+const eqColor = "#ecda3c";
+const downColor = "#ec0000";
 
-const color = (x :number) => {
+const color = (x: number) => {
   if (x > 0) {
     return upColor;
   } else if (x < 0) {
@@ -118,9 +133,9 @@ const color = (x :number) => {
   } else {
     return eqColor;
   }
-}
+};
 
-const icon = (x :number) => {
+const icon = (x: number) => {
   if (x > 0) {
     return up;
   } else if (x < 0) {
@@ -128,25 +143,31 @@ const icon = (x :number) => {
   } else {
     return eq;
   }
-}
+};
 
-const toDecimalAU = (value :number) => 
-  new Intl.NumberFormat('en-AU', { style: "decimal" }).format(value);
+const toDecimalAU = (value: number) =>
+  new Intl.NumberFormat("en-AU", { style: "decimal" }).format(value);
 
-const toPercentAU = (value :number) => 
-  new Intl.NumberFormat('en-AU', { style: "percent", minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value);
+const toPercentAU = (value: number) =>
+  new Intl.NumberFormat("en-AU", {
+    style: "percent",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(value);
 
-const toUnitAU = (value :number) => 
-  new Intl.NumberFormat('en-AU', { style: "unit" }).format(value);
+const toUnitAU = (value: number) =>
+  new Intl.NumberFormat("en-AU", { style: "unit" }).format(value);
 
-const toAUD = (value: number | bigint | Intl.StringNumericLiteral): string => 
-  new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD' }).format(value);
+const toAUD = (value: number | bigint | Intl.StringNumericLiteral): string =>
+  new Intl.NumberFormat("en-AU", { style: "currency", currency: "AUD" }).format(
+    value,
+  );
 
 /**
  * Yahoo:
  * Indexes are prefixed with: ^
  * Australian Exchange Ticker Symbols are suffixed with: .AX
- * 
+ *
  * Commsec:
  * Ticker Symbols are called stockCode & exchangeCode.
  */
@@ -175,9 +196,8 @@ const watchList: CrossExchangeTickerSymbol[] = [
   {
     commsec: "VAS",
     yahoo: "VAS.AX",
-  }
+  },
 ];
-
 
 export {
   watchList,

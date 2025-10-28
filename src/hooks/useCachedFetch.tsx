@@ -1,4 +1,3 @@
-// hooks/useCachedFetch.ts
 import { useEffect, useRef, useState } from "react";
 import { cache, DEFAULT_TTL } from "./cache";
 import { init, loading, error, type AsyncResult } from "@/lib";
@@ -9,9 +8,8 @@ export function useCachedFetch<T>(
   options: {
     enabled?: boolean;
     ttl?: number;
-  } = {}
+  } = {},
 ): AsyncResult<T> {
-
   // with default options
   const { enabled = true, ttl = DEFAULT_TTL } = options;
 
@@ -38,7 +36,7 @@ export function useCachedFetch<T>(
     prevKeyRef.current = key;
 
     // Skip loading state if already cached
-    const isCached = cache.size() > 0 && cache['cache'].has(key);
+    const isCached = cache.size() > 0 && cache["cache"].has(key);
     if (!isCached) {
       setState(loading());
     }
@@ -53,9 +51,12 @@ export function useCachedFetch<T>(
       })
       .catch((err: unknown) => {
         if (!mountedRef.current || canceled) return;
-        setState(error(new Error("Unhandled error...")));
-      })
-      ;
+        setState(
+          error(
+            new Error("Unhandled error... see error.cause", { cause: err }),
+          ),
+        );
+      });
 
     return () => {
       canceled = true;
@@ -63,9 +64,4 @@ export function useCachedFetch<T>(
   }, [key, enabled, fetchFn, ttl]);
 
   return state;
-};
-
-
-
-
-
+}

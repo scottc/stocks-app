@@ -26,28 +26,25 @@ function parseCsv(content: string): CommsecTransaction[] {
   const lines = content.trim().split("\n");
   // const headers = lines[0]?.split(",");
 
-  return lines
-    .slice(1)
-    .map((line, i): CommsecTransaction => {
+  return lines.slice(1).map((line): CommsecTransaction => {
+    const values = line.split(",");
 
-      const values = line.split(",");
-      
-      // if (values.length !== headers?.length) {
-      //   console.warn(`Skipping malformed line ${i + 2}: ${line}`);
-      //   return null;
-      // }
+    // if (values.length !== headers?.length) {
+    //   console.warn(`Skipping malformed line ${i + 2}: ${line}`);
+    //   return null;
+    // }
 
-      const x: CommsecTransaction = {
-        date: values[0]?.trim() ?? "",
-        reference: values[1]?.trim() ?? "",
-        details: values[2]?.trim() ?? "",
-        debit: parseFloat(values[3]?.trim() ?? ""),
-        credit: parseFloat(values[4]?.trim() ?? ""),
-        balance: parseFloat(values[5]?.trim() ?? ""),
-      };
+    const x: CommsecTransaction = {
+      date: values[0]?.trim() ?? "",
+      reference: values[1]?.trim() ?? "",
+      details: values[2]?.trim() ?? "",
+      debit: parseFloat(values[3]?.trim() ?? ""),
+      credit: parseFloat(values[4]?.trim() ?? ""),
+      balance: parseFloat(values[5]?.trim() ?? ""),
+    };
 
-      return x;
-    });
+    return x;
+  });
 }
 
 // Main function
