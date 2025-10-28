@@ -1,0 +1,10 @@
+:root {
+  background: #222;
+  color: #ccc;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+html, body, div#root {
+  margin: 0px;
+  padding: 0px;
+}
