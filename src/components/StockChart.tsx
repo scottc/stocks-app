@@ -1,18 +1,10 @@
 import EChartsReact, { type EChartsOption } from "echarts-for-react";
-import { match, type CrossExchangeTickerSymbol } from "@/lib";
+import { match, type CrossExchangeTickerSymbol } from "@/lib/lib";
 import type { YahooStockData } from "@/data-loaders/yahoo-finance-charts";
 import { useYahooStock } from "@/hooks/useYahooStock";
-import { useCommsecHoldings } from "@/hooks/useCommsecHoldings";
 import { ErrorView } from "./Error";
-
-// const StockSymbolPicker = ({ value, onChange }: { value: StockSymbol; onChange?: ChangeEventHandler<HTMLSelectElement> }) => (
-//     <>
-//     <label>StockSymbol: </label>
-//     <select value={value} onChange={onChange}>
-//         {symbols.map((k) => <option key={k} value={k}>{k}</option>)}
-//     </select>
-//     </>
-// );
+import { Card } from "./Card";
+import WebGLCandlestickChart, { generateMockData, type Candle } from "./Chart";
 
 interface ChartComponentProps {
   symbol: CrossExchangeTickerSymbol;
@@ -38,31 +30,33 @@ const toChartData = (
     throw new Error("unhandled");
   }
 
-  const startat = (r.timestamp.length ?? 0) - history;
+  const startat1 = (r.timestamp.length ?? 0) - history;
 
   const vals: ChartValues = r.timestamp
-    .slice(startat)
+    .slice(startat1)
     .map((_, index) => [
-      q.open.at(startat + index) ?? 0,
-      q.close.at(startat + index) ?? 0,
-      q.low.at(startat + index) ?? 0,
-      q.high.at(startat + index) ?? 0,
-      q.volume.at(startat + index) ?? 0,
-    ]);
+      q.open.at(startat1 + index) ?? 0,
+      q.close.at(startat1 + index) ?? 0,
+      q.low.at(startat1 + index) ?? 0,
+      q.high.at(startat1 + index) ?? 0,
+      q.volume.at(startat1 + index) ?? 0,
+    ])
+    .filter((d) => (d.at(4) ?? 0) !== 0);
 
   const volumes: ChartVolumes = r.timestamp
-    .slice(startat)
+    .slice(startat1)
     .map((_, index) => [
-      startat + index,
-      q.volume.at(startat + index) ?? 0,
-      (q.open.at(startat + index) ?? 0) > (q.close.at(startat + index) ?? 0)
+      startat1 + index,
+      q.volume.at(startat1 + index) ?? 0,
+      (q.open.at(startat1 + index) ?? 0) > (q.close.at(startat1 + index) ?? 0)
         ? 1
         : -1,
-    ]);
+    ])
+    .filter((v) => (v.at(1) ?? 0) !== 0);
 
   const data: StockDataForChart = {
     categoryData: r.timestamp
-      .slice(startat)
+      .slice(startat1)
       .map((value) => new Date(value * 1000).toISOString().slice(0, 10)),
     values: vals,
     volumes: volumes,
@@ -71,25 +65,21 @@ const toChartData = (
   return data;
 };
 
-/*
-function calculateMA(dayCount: number, data: StockDataForChart) {
+function calculateMA2(dayCount: number, values: (number | null)[]) {
   var result = [];
-  for (var i = 0, len = data.values.length; i < len; i++) {
+  for (var i = 0, len = values.length ?? 0; i < len; i++) {
     if (i < dayCount) {
       result.push("-");
       continue;
     }
     var sum = 0;
     for (var j = 0; j < dayCount; j++) {
-      data.values;
-
-      sum += data.values[i - j]?.[1] ?? 0;
+      sum += values[i - j] ?? 0; // close value
     }
     result.push(+(sum / dayCount));
   }
   return result;
 }
-*/
 
 /**
  * open,
@@ -121,18 +111,17 @@ export interface StockDataForChart {
 }
 
 const toChartOptions = (
-  v: StockDataForChart,
-  buyPrice: number,
+  filteredByPeriod: StockDataForChart,
+  all: YahooStockData,
+  period: number,
 ): EChartsOption => {
   const option = {
     animation: false,
-    /*
-      legend: {
-        bottom: 10,
-        left: 'center',
-        data: ['index values', 'MA5', 'MA10', 'MA20', 'MA30', "Buy Price"]
-      },
-      */
+    legend: {
+      bottom: 10,
+      left: "center",
+      data: ["bars", "MA50", "MA200"],
+    },
     tooltip: {
       trigger: "axis",
       axisPointer: {
@@ -155,38 +144,38 @@ const toChartOptions = (
         backgroundColor: "#777",
       },
     },
-    //   toolbox: {
-    //     feature: {
-    //       dataZoom: {
-    //         yAxisIndex: false
-    //       },
-    //       brush: {
-    //         type: ['lineX', 'clear']
-    //       }
-    //     }
-    //   },
-    //   brush: {
-    //     xAxisIndex: 'all',
-    //     brushLink: 'all',
-    //     outOfBrush: {
-    //       colorAlpha: 0.1
-    //     }
-    //   },
-    //   visualMap: {
-    //     show: false,
-    //     seriesIndex: 5,
-    //     dimension: 2,
-    //     pieces: [
-    //       {
-    //         value: 1,
-    //         color: downColor
-    //       },
-    //       {
-    //         value: -1,
-    //         color: upColor
-    //       }
-    //     ]
-    //   },
+    toolbox: {
+      feature: {
+        dataZoom: {
+          yAxisIndex: false,
+        },
+        brush: {
+          type: ["lineX", "clear"],
+        },
+      },
+    },
+    brush: {
+      xAxisIndex: "all",
+      brushLink: "all",
+      outOfBrush: {
+        colorAlpha: 0.1,
+      },
+    },
+    visualMap: {
+      show: false,
+      seriesIndex: 5,
+      dimension: 2,
+      pieces: [
+        {
+          value: 1,
+          color: downColor,
+        },
+        {
+          value: -1,
+          color: upColor,
+        },
+      ],
+    },
     grid: [
       {
         left: "10%",
@@ -203,7 +192,7 @@ const toChartOptions = (
     xAxis: [
       {
         type: "category",
-        data: v.categoryData,
+        data: filteredByPeriod.categoryData,
         boundaryGap: false,
         axisLine: { onZero: false },
         splitLine: { show: false },
@@ -216,7 +205,7 @@ const toChartOptions = (
       {
         type: "category",
         gridIndex: 1,
-        data: v.categoryData,
+        data: filteredByPeriod.categoryData,
         boundaryGap: false,
         axisLine: { onZero: false },
         axisTick: { show: false },
@@ -263,7 +252,7 @@ const toChartOptions = (
       {
         name: "index values",
         type: "candlestick",
-        data: v.values,
+        data: filteredByPeriod.values,
         itemStyle: {
           color: upColor,
           color0: downColor,
@@ -271,59 +260,36 @@ const toChartOptions = (
           borderColor0: undefined,
         },
       },
-      /*
-        {
-          name: 'MA5',
-          type: 'line',
-          data: calculateMA(5, asyncState.value),
-          smooth: true,
-          lineStyle: {
-            opacity: 0.5
-          }
+      {
+        name: "MA50",
+        type: "line",
+        data: calculateMA2(
+          50,
+          all.chart.result.at(0)?.indicators.quote.at(0)?.close ?? [],
+        ).slice(period * -1, undefined),
+        smooth: true,
+        lineStyle: {
+          opacity: 0.5,
         },
-        {
-          name: 'MA10',
-          type: 'line',
-          data: calculateMA(10, asyncState.value),
-          smooth: true,
-          lineStyle: {
-            opacity: 0.5
-          }
+      },
+      {
+        name: "MA200",
+        type: "line",
+        data: calculateMA2(
+          200,
+          all.chart.result.at(0)?.indicators.quote.at(0)?.close ?? [],
+        ).slice(period * -1, undefined),
+        smooth: true,
+        lineStyle: {
+          opacity: 0.5,
         },
-        {
-          name: 'MA20',
-          type: 'line',
-          data: calculateMA(20, asyncState.value),
-          smooth: true,
-          lineStyle: {
-            opacity: 0.5
-          }
-        },
-        {
-          name: 'MA30',
-          type: 'line',
-          data: calculateMA(30, asyncState.value),
-          smooth: true,
-          lineStyle: {
-            opacity: 0.5
-          }
-        },
-        */
+      },
       {
         name: "Volume",
         type: "bar",
         xAxisIndex: 1,
         yAxisIndex: 1,
-        data: v.volumes,
-      },
-      {
-        name: "Buy Price",
-        type: "line",
-        data: v.categoryData.map(() => buyPrice),
-        smooth: true,
-        lineStyle: {
-          opacity: 0.5,
-        },
+        data: filteredByPeriod.volumes,
       },
     ],
   };
@@ -332,34 +298,11 @@ const toChartOptions = (
 };
 
 const StockChart = (props: ChartComponentProps) => {
-  // const [symbol, setStockSymbol] = useState<StockSymbol>(props.initialStockSymbol);
-
-  // const [buyPrice, setBuyPrice] = useState<number>(props.initalBuyPrice);
-  // const [stockCount, setStockCount] = useState<number>(props.initialStock);
-
-  // const [stopLossPercentage, setStopLossPercentage] = useState<number>(5); // Default 5% stop loss
-
   const stocks = useYahooStock({ symbol: props.symbol.yahoo });
-  const holdings = useCommsecHoldings({});
-  // const transactions = useCommsecTransactions({});
-
-  const relevantHoldings =
-    holdings.type === "value"
-      ? holdings.value.holdings.filter((x) => x.code === props.symbol.commsec)
-      : [];
-  const buyPrice = relevantHoldings.at(0)?.purchasePrice ?? 0;
-  //const stockCount = relevantHoldings.at(0)?.availUnits ?? 0;
 
   return (
     <>
-      <div
-        style={{
-          border: "5px solid black",
-          margin: "10px",
-          padding: "10px",
-          background: "rgba(0,0,0,0.2)",
-        }}
-      >
+      <Card>
         {match(stocks, {
           init: () => <></>,
           error: (e) => <ErrorView error={e} />,
@@ -385,7 +328,6 @@ const StockChart = (props: ChartComponentProps) => {
                   Yahoo {props.symbol.yahoo} {props.history}-Day Candlestick
                   Chart
                 </h2>
-
                 {/* <StockSymbolPicker value={symbol} onChange={(e) => setStockSymbol(e.target.value as StockSymbol)} />
 
             <label>Buy Price: </label>
@@ -408,11 +350,12 @@ const StockChart = (props: ChartComponentProps) => {
                 value={stopLossPercentage}
                 onChange={(e) => setStopLossPercentage(Number(e.target.value))}
             /> */}
-
                 <EChartsReact
                   option={toChartOptions(
                     toChartData(val, props.history),
-                    buyPrice,
+                    val,
+                    props.history,
+                    // buyPrice,
                   )}
                   style={{ height: 400, width: "100%" }}
                 />
@@ -431,8 +374,21 @@ const StockChart = (props: ChartComponentProps) => {
             );
           },
         })}
-      </div>
+      </Card>
     </>
+  );
+};
+
+const toCandles = (yh: YahooStockData) => {
+  const qqq = yh.chart.result.at(0)?.indicators.quote.at(0);
+  return (
+    yh.chart.result.at(0)?.timestamp.map<Candle>((ts, i) => ({
+      time: ts,
+      close: qqq?.close.at(i) ?? 0,
+      high: qqq?.high.at(i) ?? 0,
+      low: qqq?.low.at(i) ?? 0,
+      open: qqq?.open.at(i) ?? 0,
+    })) ?? []
   );
 };
 

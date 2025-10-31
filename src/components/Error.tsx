@@ -1,5 +1,5 @@
 interface ErrorViewProps {
-  error: unknown | Error;
+  error: unknown /* | Error */;
 }
 
 const ErrorView = ({ error }: ErrorViewProps) => {

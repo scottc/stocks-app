@@ -2,7 +2,7 @@ import { file, write } from "bun";
 import { join } from "path";
 import { mkdirSync } from "fs";
 import { readdir } from "fs/promises";
-import { error, value, type Result } from "@/lib";
+import { error, value, type Result } from "@/lib/lib";
 
 export interface YahooStockData {
   chart: YahooChart;
@@ -62,15 +62,20 @@ export interface TradingHours {
 
 export interface YahooChartIndicators {
   quote: YahooQuote[];
-  adjclose: number[];
+  adjclose: AdjClose[];
+}
+
+export interface AdjClose {
+  adjclose: (number | null)[];
 }
 
 export interface YahooQuote {
-  high: number[];
-  volume: number[];
-  close: number[];
-  low: number[];
-  open: number[];
+  high: (number | null)[];
+  volume: (number | null)[];
+  /** @deprecated You're probably looking for adjclose, which doesn't subtract dividends. */
+  close: (number | null)[];
+  low: (number | null)[];
+  open: (number | null)[];
 }
 
 const CACHE_DIR = join(process.cwd(), "data", "yahoo", "charts");
@@ -140,8 +145,8 @@ const yahooApiFetch = async (
       }
     }
 
-    // No valid cache; fetch from Yahoo Finance
-    const yahooUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${yahooSymbol}?period1=0&period2=9999999999&interval=1d&includePrePost=false&events=div%7Csplit`;
+    // https://query1.finance.yahoo.com/v8/finance/chart/IOO.AX?events=capitalGain%7Cdiv%7Csplit&formatted=true&includeAdjustedClose=true&interval=1d&period1=1199228400&period2=1761709580&symbol=IOO.AX&userYfid=true&lang=en-US&region=US
+    const yahooUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${yahooSymbol}?period1=0&period2=9999999999&interval=1d&includePrePost=false&includeAdjustedClose=true&events=div%7Csplit`;
     console.log(`[Network] Fetching from Yahoo Finance: ${yahooUrl}`);
     const response = await fetch(yahooUrl, {
       headers: {

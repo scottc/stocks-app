@@ -4,7 +4,8 @@ type Pending<T> = Promise<T>;
 
 export const DEFAULT_TTL = 23 * 60 * 60 * 1000; // 23 hours in milliseconds
 
-class TinyCache<K, V> {
+export class TinyCache<K, V> {
+  // TODO: consider using arrays, or object dictionarys could be faster...
   private cache = new Map<K, CacheEntry<V>>();
   private pending = new Map<K, Pending<V>>();
 
@@ -66,5 +67,5 @@ class TinyCache<K, V> {
   }
 }
 
-// Export a singleton
-export const cache = new TinyCache();
+/** @deprecated Don't use a singleton global, use per resource caches instead. It avoids key conflicts, and helps with memory management... probably. */
+export const cache = new TinyCache<string, any>();

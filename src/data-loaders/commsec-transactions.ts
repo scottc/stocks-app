@@ -1,7 +1,7 @@
 import { file } from "bun";
 import { readdir } from "fs/promises";
 import { join } from "path";
-import { value, error, type Result } from "@/lib";
+import { value, error, type Result } from "@/lib/lib";
 
 const TRANSACTIONS_DIR = join(process.cwd(), "data", "commsec", "transactions");
 

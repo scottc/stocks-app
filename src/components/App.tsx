@@ -7,12 +7,20 @@ import StockTicker from "./StockTicker";
 import StockTransactions from "./StockTransactions";
 import StockHoldings from "./StockHoldings";
 import { useCommsecHoldings } from "@/hooks/useCommsecHoldings";
-import { match, watchList } from "@/lib";
+import { match, watchList } from "@/lib/lib";
 import { ErrorView } from "./Error";
-import { CommsecLinks } from "./CommsecLinks";
+import { CommsecLinks, YahooLinks } from "./CommsecLinks";
+import { LlamaAnalyzer } from "./LlamaAnalyzer";
+import Signals from "./Signals";
+import DerivedData from "./DerivedData";
+import {
+  BacktestSimulation,
+  MonteCarloSimulation,
+  WalkForwardSimulation,
+} from "./Backtests";
 
 export function App() {
-  const [daysHistory, setDaysHistory] = useState(20);
+  const [daysHistory, setDaysHistory] = useState(63);
 
   const holdings = useCommsecHoldings({});
 
@@ -30,10 +38,12 @@ export function App() {
           value={daysHistory}
           onChange={(e) => setDaysHistory(parseInt(e.target.value))}
         >
-          <option value="5">Past 5 trading days</option>
-          <option value="10">Past 10 trading days</option>
-          <option value="20">Past 20 trading days</option>
-          <option value="60">Past 60 trading days</option>
+          <option value="20">Past 20 trading days (~1 Month)</option>
+          <option value="63">
+            Past 63 trading days (1 Quater / ~3 Months)
+          </option>
+          <option value="252">Past 252 trading days (1 Year)</option>
+          <option value="504">Past 504 trading days (2 Years)</option>
         </select>
       </div>
 
@@ -58,14 +68,22 @@ export function App() {
             >
               {watchList.map((symbol) => (
                 <div key={symbol.yahoo}>
-                  <StockTicker symbol={symbol} history={daysHistory} />
+                  <Signals symbol={symbol} history={daysHistory} />
                 </div>
               ))}
+
               {watchList.map((symbol) => (
                 <div key={symbol.yahoo}>
                   <CommsecLinks code={symbol.commsec} />
                 </div>
               ))}
+
+              {watchList.map((symbol) => (
+                <div key={symbol.yahoo}>
+                  <YahooLinks p={symbol.yahoo} />
+                </div>
+              ))}
+
               {watchList.map((symbol) => (
                 <div key={symbol.yahoo}>
                   <StockHoldings symbol={symbol} history={daysHistory} />
@@ -81,9 +99,46 @@ export function App() {
                   <StockChart symbol={symbol} history={daysHistory} />
                 </div>
               ))}
+
               {watchList.map((symbol) => (
                 <div key={symbol.yahoo}>
                   <StockTable symbol={symbol} history={daysHistory} />
+                </div>
+              ))}
+
+              {watchList.map((symbol) => (
+                <div key={symbol.yahoo}>
+                  <DerivedData symbol={symbol} history={daysHistory} />
+                </div>
+              ))}
+
+              {watchList.map((symbol) => (
+                <div key={symbol.yahoo}>
+                  <StockTicker symbol={symbol} history={daysHistory} />
+                </div>
+              ))}
+
+              {watchList.map((symbol) => (
+                <div key={symbol.yahoo}>
+                  <LlamaAnalyzer symbol={symbol.yahoo} />
+                </div>
+              ))}
+
+              {watchList.map((symbol) => (
+                <div key={symbol.yahoo}>
+                  <MonteCarloSimulation />
+                </div>
+              ))}
+
+              {watchList.map((symbol) => (
+                <div key={symbol.yahoo}>
+                  <BacktestSimulation tickerSymbol={symbol} />
+                </div>
+              ))}
+
+              {watchList.map((symbol) => (
+                <div key={symbol.yahoo}>
+                  <WalkForwardSimulation />
                 </div>
               ))}
             </div>

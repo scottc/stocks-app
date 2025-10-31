@@ -1,9 +1,9 @@
 import { type CSSProperties } from "react";
-import { useYahooStock } from "@/hooks/useYahooStock";
 import { useCommsecHoldings } from "@/hooks/useCommsecHoldings";
 
-import { match, type CrossExchangeTickerSymbol } from "@/lib";
+import { match, type CrossExchangeTickerSymbol } from "@/lib/lib";
 import { ErrorView } from "./Error";
+import { Card } from "./Card";
 
 interface ChartComponentProps {
   symbol: CrossExchangeTickerSymbol;
@@ -16,7 +16,7 @@ const style: CSSProperties = {
 };
 
 const StockHoldings = ({ symbol }: ChartComponentProps) => {
-  const stocks = useYahooStock({ symbol: symbol.yahoo });
+  //const stocks = useYahooStock({ symbol: symbol.yahoo });
   const holdings = useCommsecHoldings({});
   // const transactions = useCommsecTransactions({});
 
@@ -28,14 +28,7 @@ const StockHoldings = ({ symbol }: ChartComponentProps) => {
   //const availUnits = relevantHoldings.at(0)?.availUnits ?? 0;
 
   return (
-    <div
-      style={{
-        border: "5px solid black",
-        margin: "10px",
-        padding: "10px",
-        background: "rgba(0,0,0,0.2)",
-      }}
-    >
+    <Card>
       <h2>Commsec {symbol.commsec} Holdings</h2>
 
       {match(holdings, {
@@ -51,58 +44,72 @@ const StockHoldings = ({ symbol }: ChartComponentProps) => {
               <table style={style}>
                 <thead>
                   <tr>
-                    <th>Units</th>
-                    <th>Purchase Price</th>
+                    <th>availUnits</th>
+                    <th>changePercent</th>
+                    <th>changePrice</th>
+                    <th>code</th>
+                    <th>lastPrice</th>
+                    <th>marketValue</th>
+                    <th>profitLoss</th>
+                    <th>profitLossPercent</th>
+                    <th>purchasePrice</th>
+                    <th>valueChange</th>
+                    <th>weightPercent</th>
                   </tr>
                 </thead>
                 <tbody>
                   {relevant.map((h) => (
                     <tr key={h.code} /* TODO: is this key unique? */>
                       <td>{h.availUnits}</td>
+                      <td>{h.changePercent}</td>
+                      <td>{h.changePrice}</td>
+                      <td>{h.code}</td>
+                      <td>{h.lastPrice}</td>
+                      <td>{h.marketValue}</td>
+                      <td>{h.profitLoss}</td>
+                      <td>{h.profitLossPercent}</td>
                       <td>{h.purchasePrice}</td>
+                      <td>{h.valueChange}</td>
+                      <td>{h.weightPercent}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
-            </>
-          );
-        },
-        error: (e) => <ErrorView error={e} />,
-      })}
 
-      {match(stocks, {
-        init: () => <></>,
-        error: (e) => <ErrorView error={e} />,
-        loading: () => <>{symbol.commsec} Loading...</>,
-        value: () => {
-          //const r = val.chart.result[0];
-          //const q = first(r?.indicators.quote);
-          //const meta = r?.meta;
-          //const currentPrice = last(q?.close) ?? 0;
-          //const profit = (currentPrice - purchasePrice) * availUnits;
-
-          //const style: CSSProperties = {
-          //border: "2px solid rgb(140 140 140)",
-          //borderCollapse: "collapse",
-          //};
-
-          return (
-            <>
+              <h4>Summary:</h4>
               <p>
-                Commsec{" | "}
-                <a
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  href="https://www2.commsec.com.au/Portfolio/holdings"
-                >
-                  Holdings
-                </a>
+                marketValue: {v.summary.marketValue}
+                <br />
+                profitLoss: {v.summary.profitLoss}
+                <br />
+                profitLossPercent: {v.summary.profitLossPercent}
+                <br />
+                valueChange: {v.summary.valueChange}
+                <br />
+                weightPercent: {v.summary.weightPercent}
+                <br />
               </p>
             </>
           );
         },
+        error: (e) => <ErrorView error={e} />,
       })}
-    </div>
+
+      <button onClick={(_e) => alert("TODO: Not Yet Implemented.")}>
+        Import Commsec Holdings CSV
+      </button>
+
+      <p>
+        Commsec{" | "}
+        <a
+          target="_blank"
+          rel="noopener noreferrer"
+          href="https://www2.commsec.com.au/Portfolio/holdings"
+        >
+          Holdings
+        </a>
+      </p>
+    </Card>
   );
 };
 

@@ -2,9 +2,10 @@ import { type CSSProperties } from "react";
 import { useYahooStock } from "@/hooks/useYahooStock";
 import { useCommsecTransactions } from "@/hooks/useCommsecTransactions";
 
-import { match, type CrossExchangeTickerSymbol } from "@/lib";
+import { match, toAUD, type CrossExchangeTickerSymbol } from "@/lib/lib";
 //import { useCommsecHoldings } from "@/hooks/useCommsecHoldings";
 import { ErrorView } from "./Error";
+import { Card } from "./Card";
 
 interface ChartComponentProps {
   symbol: CrossExchangeTickerSymbol;
@@ -32,14 +33,7 @@ const ChartComponent = ({
   //const availUnits = relevantHoldings.at(0)?.availUnits ?? 0;
 
   return (
-    <div
-      style={{
-        border: "5px solid black",
-        margin: "10px",
-        padding: "10px",
-        background: "rgba(0,0,0,0.2)",
-      }}
-    >
+    <Card>
       <h2>Commsec {symbol.commsec} Transactions</h2>
 
       {match(transactions, {
@@ -67,9 +61,9 @@ const ChartComponent = ({
                       <td>{t.date}</td>
                       <td>{t.reference}</td>
                       <td>{t.details}</td>
-                      <td>{t.debit}</td>
-                      <td>{t.credit}</td>
-                      <td>{t.balance}</td>
+                      <td>{toAUD(t.debit)}</td>
+                      <td>{toAUD(t.credit)}</td>
+                      <td>{toAUD(t.balance)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -144,6 +138,12 @@ const ChartComponent = ({
                 </span>
               </p> */}
 
+              <button
+                onClick={(_e) => alert("TODO: Implement missing feature.")}
+              >
+                Import Commsec Transactions
+              </button>
+
               <p>
                 Commsec{" | "}
                 <a
@@ -158,7 +158,7 @@ const ChartComponent = ({
           );
         },
       })}
-    </div>
+    </Card>
   );
 };
 

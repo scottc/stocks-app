@@ -1,6 +1,6 @@
-import { error, value, type Result } from '@/lib';
-import { readdir, readFile } from 'fs/promises';
-import { join } from 'path';
+import { error, value, type Result } from "@/lib/lib";
+import { readdir, readFile } from "fs/promises";
+import { join } from "path";
 
 // === Types ===
 interface HoldingEntry {
@@ -35,7 +35,7 @@ export interface CommsecHoldings {
 // === In-memory cache (timestamp-based) ===
 interface CacheEntry {
   result: Result<CommsecHoldings>;
-  cachedAt: number;   // Date.now() when the data was parsed
+  cachedAt: number; // Date.now() when the data was parsed
 }
 
 let cache: CacheEntry | null = null;
@@ -43,14 +43,14 @@ let cache: CacheEntry | null = null;
 // === Helpers ===
 const toNumber = (val: string): number => {
   if (!val) return 0;
-  const cleaned = val.replace(/[$,%]/g, '').trim();
+  const cleaned = val.replace(/[$,%]/g, "").trim();
   const num = parseFloat(cleaned);
   return isNaN(num) ? 0 : num;
 };
 
 const parseCSVLine = (line: string): string[] => {
   const result: string[] = [];
-  let current = '';
+  let current = "";
   let inQuotes = false;
 
   for (let i = 0; i < line.length; i++) {
@@ -64,9 +64,9 @@ const parseCSVLine = (line: string): string[] => {
       } else {
         inQuotes = !inQuotes;
       }
-    } else if (char === ',' && !inQuotes) {
+    } else if (char === "," && !inQuotes) {
       result.push(current.trim());
-      current = '';
+      current = "";
     } else {
       current += char;
     }
@@ -77,12 +77,12 @@ const parseCSVLine = (line: string): string[] => {
 
 // === Find newest file ===
 async function findNewestHoldingsFile(): Promise<Result<string>> {
-  const dir = join(process.cwd(), 'data', 'commsec', 'holdings');
+  const dir = join(process.cwd(), "data", "commsec", "holdings");
   const files = await readdir(dir);
 
   const csvFiles = files
-    .filter(f => /^Holdings_\d+_\d{2}-\d{2}-\d{4}\.csv$/.test(f))
-    .map(f => {
+    .filter((f) => /^Holdings_\d+_\d{2}-\d{2}-\d{4}\.csv$/.test(f))
+    .map((f) => {
       const match = f.match(/_(\d{2})-(\d{2})-(\d{4})\.csv$/);
       if (!match) return null;
       const [dd, mm, yyyy] = match.slice(1);
@@ -93,70 +93,72 @@ async function findNewestHoldingsFile(): Promise<Result<string>> {
     .sort((a, b) => b.time - a.time);
 
   if (csvFiles.length === 0) {
-    return error(new Error('No Holdings_*.csv file found in ./data/commsec/holdings/'));
+    return error(
+      new Error("No Holdings_*.csv file found in ./data/commsec/holdings/"),
+    );
   }
 
   return value(join(dir, csvFiles[0]?.name ?? ""));
 }
 
 export async function loadHoldings(): Promise<Result<CommsecHoldings>> {
-
-   // If we already have a cache for *exactly this file*, return it
- if (cache) { // TODO: implement expiry.
+  // If we already have a cache for *exactly this file*, return it
+  if (cache) {
+    // TODO: implement expiry.
     console.log("[Memory] Retrived commsec holdings.");
-   return cache.result;
- }
-
+    return cache.result;
+  }
 
   const filePath = await findNewestHoldingsFile();
 
-  if(filePath.type === "error") {
+  if (filePath.type === "error") {
     return filePath;
   }
 
-  const content = await readFile(filePath.value, 'utf-8');
-  const lines = content.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+  const content = await readFile(filePath.value, "utf-8");
+  const lines = content
+    .split(/\r?\n/)
+    .map((l) => l.trim())
+    .filter(Boolean);
 
-  let accountNumber = '';
-  let asOfDateTime = '';
+  let accountNumber = lines.at(0);
+  let asOfDateTime = lines.at(1);
   const holdings: HoldingEntry[] = [];
   let summary: HoldingSummary | null = null;
 
   for (const line of lines) {
     // Skip headers and section titles
     if (
-      line.startsWith('Code,') ||
-      line.startsWith('CHESS') ||
-      line.startsWith('Issuer Sponsored Holdings') ||
-      line.startsWith('There are no') ||
-      line.includes('Share Holdings')
+      line.startsWith("Code,") ||
+      line.startsWith("CHESS") ||
+      line.startsWith("Issuer Sponsored Holdings") ||
+      line.startsWith("There are no") ||
+      line.includes("Share Holdings")
     ) {
       continue;
     }
 
     // Account Number
-    if (line.startsWith('Account Number:')) {
-      accountNumber = line.replace('Account Number:', '').trim();
+    if (line.startsWith("Account Number:")) {
+      accountNumber = line.replace("Account Number:", "").trim();
       continue;
     }
 
-    // As-of timestamp (quoted)
     // "Share Holdings    As of 2:42:03 PM Sydney Time, 28 Oct 2025"
-    if (line.includes('As of') && line.includes('Sydney Time')) {
-      const match = line.match(/"(.+?)"/);
-      asOfDateTime = (match ? match[1] : line) ?? "";
+    if (line.includes('"Share Holdings')) {
+      asOfDateTime = line;
       continue;
     }
 
     // Parse CSV rows
-    if (line.includes(',')) {
+    if (line.includes(",")) {
       const cols = parseCSVLine(line);
 
       // Skip subtotal or empty rows
-      if (!cols[0] || cols[0] === 'Subtotal') continue;
+      if (!cols[0] || cols[0] === "Subtotal") continue;
 
       // Final Total line
-      if (cols[0] === 'Total') {
+      if (cols[0] === "Total") {
         summary = {
           profitLoss: toNumber(cols[6] ?? ""),
           profitLossPercent: toNumber(cols[7] ?? ""),
@@ -189,15 +191,19 @@ export async function loadHoldings(): Promise<Result<CommsecHoldings>> {
 
   let result: Result<CommsecHoldings> | null = null;
 
-  if (!accountNumber){ result = error(new Error('Account number not found')); }
-  // if (!asOfDateTime) return error(new Error('As-of timestamp not found')); // TODO: fix
-  else if (!summary){ result = error(new Error('Summary (Total) line not found')); }
-
-  else { result = value({ accountNumber, asOfDateTime, holdings, summary }); }
+  if (!accountNumber) {
+    result = error(new Error("Account number not found"));
+  } else if (!asOfDateTime) {
+    return error(new Error("As-of timestamp not found")); // TODO: fix
+  } else if (!summary) {
+    result = error(new Error("Summary (Total) line not found"));
+  } else {
+    result = value({ accountNumber, asOfDateTime, holdings, summary });
+  }
 
   cache = {
     cachedAt: Date.now(),
-    result: result
+    result: result,
   };
 
   console.log("[Disk] Retrived commsec holdings from disk.");

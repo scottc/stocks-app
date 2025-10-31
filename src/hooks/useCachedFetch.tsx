@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { cache, DEFAULT_TTL } from "./cache";
-import { init, loading, error, type AsyncResult } from "@/lib";
+import { init, loading, error, type AsyncResult } from "@/lib/lib";
 
+// TODO: take cache as a curried function, for dependency injection, so we can have more then 1 cache, instead of a monolithic singleton.
 export function useCachedFetch<T>(
   key: string | null,
   fetchFn: () => Promise<AsyncResult<T>>,

@@ -135,6 +135,17 @@ const color = (x: number) => {
   }
 };
 
+const color2 = (x: "hold" | "buy" | "sell") => {
+  switch (x) {
+    case "buy":
+      return upColor;
+    case "sell":
+      return downColor;
+    case "hold":
+      return eqColor;
+  }
+};
+
 const icon = (x: number) => {
   if (x > 0) {
     return up;
@@ -155,8 +166,8 @@ const toPercentAU = (value: number) =>
     maximumFractionDigits: 2,
   }).format(value);
 
-const toUnitAU = (value: number) =>
-  new Intl.NumberFormat("en-AU", { style: "unit" }).format(value);
+//const toUnitAU = (value: number) =>
+//  new Intl.NumberFormat("en-AU", { style: "unit" }).format(value);
 
 const toAUD = (value: number | bigint | Intl.StringNumericLiteral): string =>
   new Intl.NumberFormat("en-AU", { style: "currency", currency: "AUD" }).format(
@@ -178,25 +189,58 @@ export interface CrossExchangeTickerSymbol {
 
 const watchList: CrossExchangeTickerSymbol[] = [
   {
+    // Top 100 global Big Cap
     commsec: "IOO",
     yahoo: "IOO.AX",
   },
   {
-    commsec: "XJO",
-    yahoo: "^AXJO",
+    commsec: "VAE",
+    yahoo: "VAE.AX",
+  },
+];
+
+const other = [
+  {
+    // Vangard Global Big, Medium & Small Cap
+    commsec: "VTI",
+    yahoo: "VTI",
   },
   {
-    commsec: "VAP",
-    yahoo: "VAP.AX",
-  },
-  {
+    // Precious Metals
     commsec: "ETPMPM",
     yahoo: "ETPMPM.AX",
   },
   {
-    commsec: "VAS",
-    yahoo: "VAS.AX",
+    // Australian Property
+    commsec: "VAP",
+    yahoo: "VAP.AX",
   },
+  {
+    commsec: "OZR",
+    yahoo: "OZR.AX",
+  },
+  {
+    // Non-Australian Property
+    commsec: "GLPR",
+    yahoo: "GLPR.AX",
+  },
+  {
+    // Aus Government bonds
+    commsec: "GOVT",
+    yahoo: "GOVT.AX",
+  },
+  {
+    commsec: "OZF",
+    yahoo: "OZF.AX",
+  },
+  // {
+  //   commsec: "XJO",
+  //   yahoo: "^AXJO",
+  // },
+  //{
+  //  commsec: "VAS",
+  //  yahoo: "VAS.AX",
+  //},
 ];
 
 export {
@@ -213,7 +257,8 @@ export {
   toAUD,
   toDecimalAU,
   toPercentAU,
-  toUnitAU,
+  // toUnitAU,
   color,
+  color2,
   icon,
 };

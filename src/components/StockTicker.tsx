@@ -1,7 +1,8 @@
-import { match, type CrossExchangeTickerSymbol } from "@/lib";
+import { match, type CrossExchangeTickerSymbol } from "@/lib/lib";
 import { useYahooStock } from "@/hooks/useYahooStock";
 //import { useCommsecHoldings } from "@/hooks/useCommsecHoldings";
 import { ErrorView } from "./Error";
+import { Card } from "./Card";
 
 interface ChartComponentProps {
   symbol: CrossExchangeTickerSymbol;
@@ -22,14 +23,7 @@ const ChartComponent = ({ symbol }: ChartComponentProps) => {
 
   return (
     <>
-      <div
-        style={{
-          border: "5px solid black",
-          margin: "10px",
-          padding: "10px",
-          background: "rgba(0,0,0,0.2)",
-        }}
-      >
+      <Card>
         <h2>Yahoo {symbol.yahoo} Information</h2>
 
         {match(stocks, {
@@ -212,21 +206,11 @@ const ChartComponent = ({ symbol }: ChartComponentProps) => {
                 </tr>
               </tbody>
             </table> */}
-
-                <p>
-                  Commsec{" | "}
-                  <a
-                    target="_blank"
-                    href={`https://www2.commsec.com.au/Quotes?stockCode=${symbol.commsec}&exchangeCode=ASX`}
-                  >
-                    {symbol.commsec} Quotes
-                  </a>
-                </p>
               </>
             );
           },
         })}
-      </div>
+      </Card>
     </>
   );
 };
