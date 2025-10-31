@@ -4,6 +4,9 @@ import index from "./index.html";
 import { yahooApiFetch } from "./data-loaders/yahoo-finance-charts";
 import { loadLatestTransactions } from "./data-loaders/commsec-transactions";
 import { loadHoldings } from "./data-loaders/commsec-holdings";
+import { fetchASXListedSecurities } from "./data-loaders/asx";
+
+
 
 //import stream from "./ssr-react";
 
@@ -12,6 +15,7 @@ const app = new Elysia()
   .get("/*", index)
   .get("/api/commsecholdings", async () => await loadHoldings())
   .get("/api/commsectransactions", async () => await loadLatestTransactions())
+  .get("/api/asx/listedcompanies", async () => await fetchASXListedSecurities())
   .get(
     "/api/yahoo/:symbol",
     async (req) => await yahooApiFetch(req.params.symbol),

@@ -18,6 +18,7 @@ import {
   MonteCarloSimulation,
   WalkForwardSimulation,
 } from "./Backtests";
+import { AsxSelect } from "./AsxSelect";
 
 export function App() {
   const [daysHistory, setDaysHistory] = useState(63);
@@ -45,6 +46,8 @@ export function App() {
           <option value="252">Past 252 trading days (1 Year)</option>
           <option value="504">Past 504 trading days (2 Years)</option>
         </select>
+
+        <AsxSelect />
       </div>
 
       <div style={{ height: 40 }}></div>

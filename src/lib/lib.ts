@@ -1,3 +1,20 @@
+/**
+ * A Unit type, that represents a single possible value
+ * unit(); // Unit
+ * [1, 2, 3].map(unit); // [Unit, Unit, Unit]
+ */
+export interface Unit {
+  type: "unit";
+}
+
+const unit = (): Unit => ({ type: "unit" });
+
+/**
+ * Aka
+ * The Some type.
+ * The Value type.
+ * The Result type.
+ */
 export interface ValueResult<T /* , E = Error*/> {
   type: "value";
   value: T;
@@ -242,6 +259,16 @@ const other = [
   //  yahoo: "VAS.AX",
   //},
 ];
+
+console.log(process.env.FINNHUB_API_KEY ?? "foobar");
+
+function finhubApiKey(
+  e: NodeJS.ProcessEnv,
+): Unit | { type: "value"; value: string } {
+  return e.FINNHUB_API_KEY === undefined
+    ? { type: "unit" }
+    : { type: "value", value: e.FINNHUB_API_KEY };
+}
 
 export {
   watchList,
