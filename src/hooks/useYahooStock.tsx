@@ -3,7 +3,7 @@ import client from "@/client";
 import { DEFAULT_TTL } from "./cache";
 import type { AsyncResult } from "@/lib/lib";
 import type { YahooStockData } from "@/data-loaders/yahoo-finance-charts";
-import type { OHLCV } from "@/fin/signals";
+import type { OHLCVT } from "@/fin/signals";
 
 interface UseYahooStockOptions {
   symbol: string;
@@ -18,11 +18,11 @@ export const useYahooStock = ({
 }: UseYahooStockOptions) =>
   useCachedFetch(
     // cache key
-    `client.api.yahoo({ symbol: : ${symbol} })`,
+    `client.api.yahoo.chart({ symbol: : ${symbol} })`,
     // cache task
     () =>
-      client.api
-        .yahoo({ symbol })
+      client.api.yahoo
+        .chart({ symbol })
         .get()
         .then((res) => {
           if (!res.data) throw new Error("No data");
@@ -32,7 +32,7 @@ export const useYahooStock = ({
     { enabled, ttl },
   );
 
-export const toOHLCV = (stocks: AsyncResult<YahooStockData>): OHLCV[] => {
+export const toOHLCV = (stocks: AsyncResult<YahooStockData>): OHLCVT[] => {
   const quote = stocks.value?.chart.result.at(0)?.indicators.quote;
   const highs = quote?.at(0)?.high ?? [];
   const lows = quote?.at(0)?.low ?? [];
@@ -43,7 +43,7 @@ export const toOHLCV = (stocks: AsyncResult<YahooStockData>): OHLCV[] => {
   const timestamps = stocks.value?.chart.result.at(0)?.timestamp ?? [];
 
   const ohlcvs = timestamps.map(
-    (ts, index): OHLCV => ({
+    (ts, index): OHLCVT => ({
       timestamp: ts,
       close: closes.at(index) ?? 0,
       high: highs.at(index) ?? 0,

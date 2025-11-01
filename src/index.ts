@@ -5,19 +5,22 @@ import { yahooApiFetch } from "./data-loaders/yahoo-finance-charts";
 import { loadLatestTransactions } from "./data-loaders/commsec-transactions";
 import { loadHoldings } from "./data-loaders/commsec-holdings";
 import { fetchASXListedSecurities } from "./data-loaders/asx";
-
-
+import { cache, instance } from "./data-loaders/alpha-vantage";
 
 //import stream from "./ssr-react";
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const app = new Elysia()
   .get("/*", index)
-  .get("/api/commsecholdings", async () => await loadHoldings())
-  .get("/api/commsectransactions", async () => await loadLatestTransactions())
-  .get("/api/asx/listedcompanies", async () => await fetchASXListedSecurities())
+  .get("/api/asx/listedcompanies", fetchASXListedSecurities)
+  .get("/api/commsec/holdings", loadHoldings)
+  .get("/api/commsec/transactions", loadLatestTransactions)
+  .get("/api/alphavantage/LISTING_STATUS", () => cache)
   .get(
-    "/api/yahoo/:symbol",
+    "/api/alphavantage/NEWS_SENTIMENT/:tickers",
+    async (req) => await instance.NEWS_SENTIMENT(req.params.tickers),
+  )
+  .get(
+    "/api/yahoo/chart/:symbol",
     async (req) => await yahooApiFetch(req.params.symbol),
   )
   //.get("/ssr", async (req) => new Response(stream, { headers: {'Content-Type': 'text/html'}, }))

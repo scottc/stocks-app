@@ -76,14 +76,21 @@ interface OpenApi2SchemaFile {
   >;
 }
 
-interface OpenApi2TypeDefs {}
 interface TypescriptApiClient {
+  baseUrl: string;
+  security: Record<string, { type: string; name: string; in: string }>;
   functionDefinitions: TypescriptFunction[];
 }
 
 interface TypescriptFunction {
   name: string;
   args: { name: string; type: TypescriptType }[];
+  fetchValues: {
+    path: string;
+    method: "get" | "post";
+    consumes: "application/json";
+    produces: "application/json";
+  };
   returns: TypescriptType;
   //... body implementation configuration details...
 }
@@ -155,7 +162,7 @@ const typeToString = (t: TypescriptType) =>
 const toImpl = (x: OpenApi2SchemaFile): TypescriptApiClient => {
   const ttt = Object.entries(x.paths).map(
     ([path, httpVerbRecord]): TypescriptFunction => ({
-      name: "f",
+      name: path.replaceAll("/", "").replaceAll("-", ""),
       args: [
         {
           name: "arg1",
@@ -165,14 +172,22 @@ const toImpl = (x: OpenApi2SchemaFile): TypescriptApiClient => {
           },
         },
       ],
+      fetchValues: {
+        path: path,
+        method: "get",
+        consumes: "application/json",
+        produces: "application/json",
+      },
       returns: {
-        name: "HttpResult",
+        name: "HttpResult<200,{x:'c'}>|HttpResult<404,{b:'d'}>",
         type: "object",
       },
     }),
   );
 
   return {
+    baseUrl: `${x.schemes.at(0) ?? ""}://${x.host}${x.basePath}`,
+    security: { api_key: { name: "token", in: "", type: "" } },
     functionDefinitions: ttt,
   };
 };
@@ -191,32 +206,53 @@ console.log(f, f.value);
 const typescriptNamespaceToString = (x: TypescriptNamespace): string =>
   `/** @file foobar */
 /** ${x.name} */
-export namespace ${x.name} {
+// export namespace ${x.name} {
+
+export type ApiClient = typeof instance;
 
 /** The Generic Response Type. */
-export type HttpResult<S, B> = { type: "httpResult", status: S, body: B };
+export type HttpResult<S, B> = { type: "httpResult", status: S, body: B, headers: Headers };
 
 /** A Network Error, it could be TCP/IP error, timeout error etc. */
 export type HttpError = { type: "httpError", error: Error };
 
 ${x.types.reduce((pv, cv, _ci, _arr) => `${pv}\n${typeToString(cv)}`, "")}
-}
+// }
 `;
 
 const typescriptApiClienttoString = (x: TypescriptApiClient): string =>
   `
-export const client: ApiClient = (baseUrl: string = "") => ({
+/** helper function */
+export async function tryFetch(
+  url: string,
+): Promise<HttpResult<number, any> | HttpError> {
+  try {
+    const r = await fetch(url);
+    const j = await r.json();
+    return { type: "httpResult", status: r.status, headers: r.headers, body: j };
+  } catch (err: unknown) {
+    return { type: "httpError", error: err as any };
+  }
+}
+
+/**
+ * The API Client Factory, returns ApiClient.
+ * @param baseUrl Default: "${x.baseUrl}"
+ */
+export const client = (baseUrl: string = "${x.baseUrl}") => ({
   baseUrl: baseUrl,
 
   ${x.functionDefinitions.reduce(
     (pv, cv, _a, _b) => `
     ${pv}
 
-  ${cv.name}: async (${cv.args.reduce((a, b) => `${a}${b.name}: ${b.type.name} `, "")}): Promise<${cv.returns.name} | HttpError> => await fetch(baseUrl + "/foo", {/* options */}),
+  ${cv.name}: async (${cv.args.reduce((a, b) => `${a}${b.name}: ${b.type.name} `, "")}): Promise<${cv.returns.name} | HttpError> => await tryFetch(baseUrl + "${cv.fetchValues.path}"),
   `,
     "",
   )}
-  })
+  });
+
+const instance = client();
 
   `;
 
@@ -225,7 +261,7 @@ const namespace = typescriptNamespaceToString(toTypescriptNamespace(f.value));
 const impl = typescriptApiClienttoString(toImpl(f.value));
 
 await tri(
-  write(file("./src/openapigen/swagger.json.ts"), `${namespace}\n${impl}`),
+  write(file("./src/openapigen/apiclient.ts"), `${namespace}\n${impl}`),
 );
 
 // Test with: bun ./src/openapigen/index.ts

@@ -12,16 +12,16 @@ const DEFAULT_OPTS: UseCommsecHoldingsOptions = {
   ttl: DEFAULT_TTL,
 };
 
-export const useCommsecHoldings = (opts: UseCommsecHoldingsOptions = {}) => 
+export const useCommsecHoldings = (opts: UseCommsecHoldingsOptions = {}) =>
   useCachedFetch(
     // cache key
-    `client.api.commsecholdings()`,
+    `client.api.commsec.holdings()`,
     // cache task
     () =>
-      client.api.commsecholdings.get().then((res) => {
+      client.api.commsec.holdings.get().then((res) => {
         if (!res.data) throw new Error("No data");
         return res.data;
       }),
     // options
-    { ...DEFAULT_OPTS, ...opts }
+    { ...DEFAULT_OPTS, ...opts },
   );

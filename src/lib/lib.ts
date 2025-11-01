@@ -6,8 +6,9 @@
 export interface Unit {
   type: "unit";
 }
+const UNIT: Unit = { type: "unit" };
 
-const unit = (): Unit => ({ type: "unit" });
+const unit = (): Unit => UNIT;
 
 /**
  * Aka
@@ -260,18 +261,10 @@ const other = [
   //},
 ];
 
-console.log(process.env.FINNHUB_API_KEY ?? "foobar");
-
-function finhubApiKey(
-  e: NodeJS.ProcessEnv,
-): Unit | { type: "value"; value: string } {
-  return e.FINNHUB_API_KEY === undefined
-    ? { type: "unit" }
-    : { type: "value", value: e.FINNHUB_API_KEY };
-}
-
 export {
   watchList,
+  UNIT,
+  unit,
   value,
   error,
   loading,

@@ -1,21 +1,24 @@
 import { useAsxListedCompanies } from "@/hooks/useAsxListedCompanies";
 import { match } from "@/lib/lib";
 import { ErrorView } from "./Error";
+import { useAlphaVantageListingStatus } from "@/hooks/useAlphaVantageListingStatus";
 
 const AsxSelect = () => {
-  const asx = useAsxListedCompanies();
+  const listingsState = useAlphaVantageListingStatus();
 
-  return match(asx, {
+  return match(listingsState, {
     init: () => <></>,
     loading: () => <></>,
-    value: (v) => (
+    value: (listings) => (
       <select>
-        <optgroup>{v.datetime}</optgroup>
-        {v.entries.map((e) => (
-          <option key={e.asxCode}>
-            {e.asxCode} - {e.companyName} - {e.gicsIndustyGroup}
-          </option>
-        ))}
+        <optgroup label="EFTs">
+          {listings.map((listing) => (
+            <option key={`${listing.exchange}/${listing.symbol}`}>
+              {listing.symbol} - {listing.name}{" "}
+              {new Date(listing.ipoDate).toISOString().substring(0, 10)}
+            </option>
+          ))}
+        </optgroup>
       </select>
     ),
     error: (e) => <ErrorView error={e} />,

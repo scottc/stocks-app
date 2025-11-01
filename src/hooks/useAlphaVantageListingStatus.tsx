@@ -2,25 +2,25 @@ import { useCachedFetch } from "./useCachedFetch";
 import client from "@/client";
 import { DEFAULT_TTL } from "./cache";
 
-interface UseCommsecTransactionsOptions {
+interface UseAlphaVantageListingStatusOptions {
   enabled?: boolean;
   ttl?: number;
 }
 
-const DEFAULT_OPTS: UseCommsecTransactionsOptions = {
+const DEFAULT_OPTS: UseAlphaVantageListingStatusOptions = {
   enabled: true,
   ttl: DEFAULT_TTL,
 };
 
-export const useCommsecTransactions = (
-  opts: UseCommsecTransactionsOptions = {},
+export const useAlphaVantageListingStatus = (
+  opts: UseAlphaVantageListingStatusOptions = {},
 ) =>
   useCachedFetch(
     // cache key
-    `client.api.commsec.transactions()`,
+    `client.api.alphavantage.LISTING_STATUS()`,
     // cache task
     () =>
-      client.api.commsec.transactions.get().then((res) => {
+      client.api.alphavantage.LISTING_STATUS.get().then((res) => {
         if (!res.data) throw new Error("No data");
         return res.data;
       }),

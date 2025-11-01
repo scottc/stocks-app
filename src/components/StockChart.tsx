@@ -73,10 +73,18 @@ function calculateMA2(dayCount: number, values: (number | null)[]) {
       continue;
     }
     var sum = 0;
+    var zeroCount = 0;
     for (var j = 0; j < dayCount; j++) {
-      sum += values[i - j] ?? 0; // close value
+      const v = values[i - j] ?? 0;
+
+      // A hack to excluse zero values...
+      if (v === 0) {
+        zeroCount += 1;
+      }
+
+      sum += v; // close value
     }
-    result.push(+(sum / dayCount));
+    result.push(+(sum / (dayCount - zeroCount)));
   }
   return result;
 }
