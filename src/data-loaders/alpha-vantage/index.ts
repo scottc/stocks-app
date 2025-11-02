@@ -21,7 +21,7 @@ export interface ListingStatus {
 
 const CACHE_DIR = join(process.cwd(), "data", "alphavantage");
 
-const f = file(join(CACHE_DIR, "LISTING_STATUS", "listing_status.csv"));
+const f = file(join(CACHE_DIR, "LISTING_STATUS", "1761989136353.csv"));
 const t = await f.text();
 
 const parseFile = (x: string): ListingStatus[] => {

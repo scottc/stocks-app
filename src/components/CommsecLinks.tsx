@@ -15,6 +15,34 @@ const buttonStyle: CSSProperties = {
   borderRadius: "999px",
 };
 
+const LocalLinks = ({ p }: { p: string }) => (
+  <Card>
+    
+    <h2>Yahoo {p} Links</h2>
+
+    <ul>
+      <li>
+        <a href={`https://finance.yahoo.com/quote/${p}/history/?p=${p}`}>
+          View {p} History
+        </a>
+      </li>
+      <li>
+        <a target="_blank" href={`https://finance.yahoo.com/chart/${p}`}>
+          View {p} Chart
+        </a>
+      </li>
+      <li>
+        <a
+          target="_blank"
+          href={`https://query1.finance.yahoo.com/v8/finance/chart/${p}?period1=0&period2=9999999999&interval=1d&includePrePost=false&includeAdjustedClose=true&events=div%7Csplit`}
+        >
+          View {p} Raw Chart Data
+        </a>
+      </li>
+    </ul>
+  </Card>
+);
+
 const YahooLinks = ({ p }: { p: string }) => (
   <Card>
     <h2>Yahoo {p} Links</h2>

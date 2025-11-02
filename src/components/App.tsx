@@ -18,12 +18,15 @@ import {
   WalkForwardSimulation,
 } from "./Backtests";
 import { AsxSelect } from "./AsxSelect";
+import { Score } from "./Score";
+import { Disclaimer } from "./Disclaimer";
 
 export function App() {
   const [daysHistory, setDaysHistory] = useState(63);
 
   return (
     <>
+      <Disclaimer />
       <div
         style={{
           height: 40,
@@ -69,7 +72,19 @@ export function App() {
       >
         {watchList.map((symbol) => (
           <div key={symbol.yahoo}>
+            <Score ticker={symbol} />
+          </div>
+        ))}
+
+        {watchList.map((symbol) => (
+          <div key={symbol.yahoo}>
             <Signals symbol={symbol} history={daysHistory} />
+          </div>
+        ))}
+
+        {watchList.map((symbol) => (
+          <div key={symbol.yahoo}>
+            <StockChart symbol={symbol} history={daysHistory} />
           </div>
         ))}
 
@@ -94,12 +109,6 @@ export function App() {
         {watchList.map((symbol) => (
           <div key={symbol.yahoo}>
             <StockTransactions symbol={symbol} history={daysHistory} />
-          </div>
-        ))}
-
-        {watchList.map((symbol) => (
-          <div key={symbol.yahoo}>
-            <StockChart symbol={symbol} history={daysHistory} />
           </div>
         ))}
 

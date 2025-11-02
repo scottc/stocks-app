@@ -215,6 +215,20 @@ const watchList: CrossExchangeTickerSymbol[] = [
     commsec: "VAE",
     yahoo: "VAE.AX",
   },
+  {
+    commsec: "TECL",
+    yahoo: "TECL",
+  },
+  {
+    // Precious Metals
+    commsec: "ETPMPM",
+    yahoo: "ETPMPM.AX",
+  },
+  {
+    // Australian Property
+    commsec: "VAP",
+    yahoo: "VAP.AX",
+  },
 ];
 
 const other = [
