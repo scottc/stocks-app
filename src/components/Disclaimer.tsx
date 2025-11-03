@@ -7,8 +7,9 @@ export const Disclaimer: React.FC<{}> = () => {
           zIndex: 999999999999999,
           display: "block",
           width: "100%",
-          height: "32px",
+          height: "40px",
           fontSize: "32px",
+          fontWeight: "bold",
           textAlign: "center",
           background: "#f00",
           color: "#fff",
@@ -17,7 +18,7 @@ export const Disclaimer: React.FC<{}> = () => {
         This is not financial advice! Always consult expert certified financial
         advice!
       </div>
-      <div style={{ height: "32px" }}></div>
+      <div style={{ height: "48px" }}></div>
     </>
   );
 };

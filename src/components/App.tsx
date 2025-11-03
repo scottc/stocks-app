@@ -9,7 +9,7 @@ import StockTicker from "./StockTicker";
 import StockTransactions from "./StockTransactions";
 import StockHoldings from "./StockHoldings";
 import { CommsecLinks, YahooLinks } from "./CommsecLinks";
-import { LlamaAnalyzer } from "./LlamaAnalyzer";
+import { LlamaAnalyzer, LlamaChat } from "./LlamaAnalyzer";
 import Signals from "./Signals";
 import DerivedData from "./DerivedData";
 import {
@@ -18,7 +18,7 @@ import {
   WalkForwardSimulation,
 } from "./Backtests";
 import { AsxSelect } from "./AsxSelect";
-import { Score } from "./Score";
+import { ScoreCard } from "./Score";
 import { Disclaimer } from "./Disclaimer";
 
 export function App() {
@@ -72,7 +72,14 @@ export function App() {
       >
         {watchList.map((symbol) => (
           <div key={symbol.yahoo}>
-            <Score ticker={symbol} />
+            <LlamaChat />
+            <LlamaAnalyzer symbol="asd" />
+          </div>
+        ))}
+
+        {watchList.map((symbol) => (
+          <div key={symbol.yahoo}>
+            <ScoreCard ticker={symbol} />
           </div>
         ))}
 
@@ -132,11 +139,7 @@ export function App() {
           </div>
         ))}
 
-        {watchList.map((symbol) => (
-          <div key={symbol.yahoo}>
-            <LlamaAnalyzer symbol={symbol.yahoo} />
-          </div>
-        ))}
+
 
         {watchList.map((symbol) => (
           <div key={symbol.yahoo}>

@@ -174,6 +174,15 @@ const icon = (x: number) => {
   }
 };
 
+const numberToFormatted = (
+  value: number,
+  options: Intl.NumberFormatOptions = { style: "decimal" },
+  culture: Intl.LocalesArgument = "en-AU",
+) => new Intl.NumberFormat(culture, options).format(value);
+
+const toIntegerAU = (value: number) =>
+  numberToFormatted(value, { style: "decimal", maximumFractionDigits: 0 });
+
 const toDecimalAU = (value: number) =>
   new Intl.NumberFormat("en-AU", { style: "decimal" }).format(value);
 
@@ -212,12 +221,29 @@ const watchList: CrossExchangeTickerSymbol[] = [
     yahoo: "IOO.AX",
   },
   {
+    // Top 100 global Big Cap
+    commsec: "HYGG",
+    yahoo: "HYGG.AX",
+  },
+  {
+    commsec: "AAA",
+    yahoo: "AAA.AX",
+  },
+  {
     commsec: "VAE",
     yahoo: "VAE.AX",
   },
   {
     commsec: "TECL",
     yahoo: "TECL",
+  },
+  {
+    commsec: "3PLT",
+    yahoo: "3PLT.L", // London
+  },
+  {
+    commsec: "FNGG",
+    yahoo: "FNGG",
   },
   {
     // Precious Metals
@@ -228,6 +254,14 @@ const watchList: CrossExchangeTickerSymbol[] = [
     // Australian Property
     commsec: "VAP",
     yahoo: "VAP.AX",
+  },
+  {
+    commsec: "CAM",
+    yahoo: "CAM",
+  },
+  {
+    commsec: "TRIL",
+    yahoo: "TRIL",
   },
 ];
 
@@ -248,6 +282,7 @@ const other = [
     yahoo: "VAP.AX",
   },
   {
+    // Aus resources, mining
     commsec: "OZR",
     yahoo: "OZR.AX",
   },
@@ -288,7 +323,9 @@ export {
   last,
   previous,
   pctDiff,
+  numberToFormatted,
   toAUD,
+  toIntegerAU,
   toDecimalAU,
   toPercentAU,
   // toUnitAU,

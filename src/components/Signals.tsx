@@ -104,7 +104,7 @@ const Signals = (props: SignalsProps) => {
   return (
     <>
       <Card>
-        <h2>Yahoo {props.symbol.yahoo} Signals</h2>
+        <h2>{props.symbol.yahoo} Timing Signals</h2>
 
         <SignalResult
           name="rsiVolume(days: 20, overbought: 65, oversold: 35) ->"

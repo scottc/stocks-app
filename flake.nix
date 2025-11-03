@@ -19,7 +19,7 @@
             pkgs.bun
 
             # ai support
-            #pkgs.ollama
+            pkgs.ollama
 
             # linters & formatters
             # pkgs.biome

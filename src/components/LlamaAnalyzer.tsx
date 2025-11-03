@@ -1,6 +1,7 @@
-import { useLlama } from "@/hooks/useLlama";
+import { useLlama, useOllamaChat } from "@/hooks/useLlama";
 import { useYahooStock } from "@/hooks/useYahooStock";
 import { Card } from "./Card";
+import { useState } from "react";
 
 export function LlamaAnalyzer({ symbol }: { symbol: string }) {
   const yahooResult = useYahooStock({ symbol });
@@ -62,3 +63,69 @@ Answer in 4 bullet points.`;
     </Card>
   );
 }
+
+export const LlamaChat = () => {
+  const { messages, pendingContent, sendMessage, isLoading, error } =
+    useOllamaChat({
+      model: "llama3.1:8b-instruct-q4_K_M", // Match your model
+    });
+  const [input, setInput] = useState("");
+
+  console.log(pendingContent, isLoading, error, messages);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (input.trim()) {
+      sendMessage(input, (chunk) => {
+        // Optional: Extra callback logic, e.g., play typing sound
+        console.log("Live chunk via callback:", chunk);
+      });
+      setInput("");
+    }
+  };
+
+  // Helper to render messages, with live pending at the end
+  const renderMessages = () => {
+    return messages.map((msg, idx) => {
+      const isPending =
+        idx === messages.length - 1 &&
+        msg.role === "assistant" &&
+        pendingContent;
+      const key = `${msg.role}-${idx}-${msg.content?.length || 0}`; // Stable key for re-renders
+
+      return (
+        <div key={key} className={`message ${msg.role}`}>
+          {JSON.stringify(msg)}
+          {msg.content || (isPending ? pendingContent : "")}
+          {msg.tool_calls && (
+            <pre>{JSON.stringify(msg.tool_calls, null, 2)}</pre>
+          )}
+          {isPending && <span className="typing-indicator">▋</span>}{" "}
+          {/* Optional cursor */}
+        </div>
+      );
+    });
+  };
+
+  return (
+    <div>
+      <div className="chat-history">
+        {pendingContent}
+        {renderMessages()}
+        {isLoading && !pendingContent && <div>Thinking...</div>}
+        {error && <div className="error">{error}</div>}
+      </div>
+      <form onSubmit={handleSubmit}>
+        <input
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder="Type your message..."
+          disabled={isLoading}
+        />
+        <button type="submit" disabled={isLoading || !input.trim()}>
+          Send
+        </button>
+      </form>
+    </div>
+  );
+};

@@ -15,13 +15,35 @@ export interface ScottScoreWeights {
 }
 
 export interface ScottScoreComponents {
-  annualizedReturn: number; // Raw annualized return (e.g., 0.10 for 10%)
-  annualizedVolatility: number; // Raw annualized volatility (e.g., 0.15 for 15%)
-  liquidityFactor: number; // Normalized [0,1]: higher = better liquidity
-  trackRecordFactor: number; // Normalized [0,1]: higher = longer proven history
-  returnScore: number; // Normalized [0,1]: higher excess return = higher score
-  riskScore: number; // Normalized [0,1]: lower volatility = higher score
-  compositeScore: number; // Weighted sum: sum(weights[i] * score[i])
+  // Factors
+
+  /** Raw annualized return (e.g., 0.10 for 10%) */
+  annualizedReturn: number;
+  /** Raw annualized volatility (e.g., 0.15 for 15%) */
+  annualizedVolatility: number;
+  /** factor */
+  avgDailyVolume: number;
+  /** factor: Unix timestamp, use new Date(avgDailyVolume * 1000) to get the datetime  */
+  firstDate: number;
+  /** factor: Unix timestamp, use new Date(avgDailyVolume * 1000) to get the datetime  */
+  lastDate: number;
+  /** factor */
+  ageInDays: number;
+  /** factor */
+  ageInYears: number;
+
+  // Scores
+
+  /** Normalized [0,1]: higher = better liquidity */
+  liquidityFactor: number;
+  /** // Normalized [0,1]: higher = longer proven history */
+  trackRecordFactor: number;
+  /** Normalized [0,1]: higher excess return = higher score */
+  returnScore: number; //
+  /** Normalized [0,1]: lower volatility = higher score */
+  riskScore: number; //
+  /** Weighted sum: sum(weights[i] * score[i]) */
+  compositeScore: number;
 }
 
 // Helper: Compute mean of array
@@ -78,26 +100,65 @@ function calculateAnnualizedVolatility(data: Candlestick[]): number {
   return dailyStdDev * Math.sqrt(252);
 }
 
-// 3. Liquidity Factor: Normalized [0,1] based on avg daily volume (log scale, cap at 1M shares/day)
-function calculateLiquidityFactor(data: Candlestick[]): number {
-  const totalVolume = data.reduce((sum, candle) => sum + candle.volume, 0);
-  const avgDailyVolume = totalVolume / data.length;
-  return Math.min(1, Math.log(avgDailyVolume + 1) / Math.log(1e6));
+interface Liquidity {
+  avgDailyVolume: number;
+  liquidityFactor: number;
 }
 
-// 4. Track Record Factor: Normalized [0,1] based on age in years (log scale, cap at 10 years)
-function calculateTrackRecordFactor(data: Candlestick[]): number {
+// 3. Liquidity Factor: Normalized [0,1] based on avg daily volume (log scale, cap at 1M shares/day)
+function calculateLiquidityFactor(data: Candlestick[]): Liquidity {
+  const totalVolume = data.reduce((sum, candle) => sum + candle.volume, 0);
+  const avgDailyVolume = totalVolume / data.length;
+  const liquidityFactor = Math.min(
+    1,
+    Math.log(avgDailyVolume + 1) / Math.log(1e6),
+  );
+
+  return {
+    avgDailyVolume,
+    liquidityFactor,
+  };
+}
+
+interface TrackRecord {
+  firstDate: number;
+  lastDate: number;
+  ageInYears: number;
+  ageInDays: number;
+  trackRecordFactor: number;
+}
+
+// 4. Track Record Factor: Normalized [0,1] based on age in years (log scale, cap at 20 years)
+function calculateTrackRecordFactor(data: Candlestick[]): TrackRecord {
   if (data.length < 1) {
-    return 0;
+    return {
+      firstDate: 0,
+      lastDate: 0,
+      ageInDays: 0,
+      ageInYears: 0,
+      trackRecordFactor: 0,
+    };
     //throw new Error("At least 1 candlestick required for track record.");
   }
   // Sort by date
   data.sort((a, b) => a.timestamp - b.timestamp);
   const firstDate = data[0].timestamp;
   const lastDate = data[data.length - 1].timestamp;
-  const ageInDays = (lastDate - firstDate) / (1000 * 60 * 60 * 24);
+  const ageInDays = (lastDate - firstDate) / (60 * 60 * 24);
   const ageInYears = ageInDays / 365.25;
-  return Math.min(1, Math.log(ageInYears + 1) / Math.log(10));
+
+  const trackRecordFactor = Math.min(
+    1,
+    Math.log(ageInYears + 1) / Math.log(20),
+  );
+
+  return {
+    firstDate,
+    lastDate,
+    ageInDays,
+    ageInYears,
+    trackRecordFactor,
+  };
 }
 
 // Normalize scores to [0,1] with configurable ranges (defaults: reasonable for equities)
@@ -123,6 +184,7 @@ function normalizeRiskScore(
 // Main composer function: Computes all components and weighted composite
 export function calculateScottScore(
   data: Candlestick[],
+  // cashrate: any,
   weights: ScottScoreWeights,
   riskFreeRate: number = 0.045, // Default 4.5% annualized
   maxExpectedExcessReturn: number = 0.15, // Configurable normalization
@@ -153,16 +215,26 @@ export function calculateScottScore(
   const compositeScore =
     weights.returns * returnScore +
     weights.risk * riskScore +
-    weights.liquidity * lf +
-    weights.proven * trf;
+    weights.liquidity * lf.liquidityFactor +
+    weights.proven * trf.trackRecordFactor;
 
   return {
-    annualizedReturn: annReturn,
-    annualizedVolatility: annVol,
-    liquidityFactor: lf,
-    trackRecordFactor: trf,
-    returnScore,
-    riskScore,
+    // returns
+    annualizedReturn: annReturn, // factor
+    returnScore, // score
+    // risks
+    annualizedVolatility: annVol, // factor
+    riskScore, // score
+    // liquidity
+    avgDailyVolume: lf.avgDailyVolume, // factor
+    liquidityFactor: lf.liquidityFactor, // score
+    // track record
+    firstDate: trf.firstDate, // factor
+    lastDate: trf.lastDate, // factor
+    ageInDays: trf.ageInDays, // factor
+    ageInYears: trf.ageInYears, // factor
+    trackRecordFactor: trf.trackRecordFactor, // score
+    // aggregate
     compositeScore,
   };
 }
