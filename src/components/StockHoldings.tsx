@@ -1,7 +1,7 @@
 import { type CSSProperties } from "react";
 import { useCommsecHoldings } from "@/hooks/useCommsecHoldings";
 
-import { match, type CrossExchangeTickerSymbol } from "@/lib/lib";
+import { match, type CrossExchangeTickerSymbol } from "@/store/lib";
 import { ErrorView } from "./Error";
 import { Card } from "./Card";
 

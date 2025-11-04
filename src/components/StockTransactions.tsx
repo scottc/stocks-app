@@ -2,7 +2,7 @@ import { type CSSProperties } from "react";
 import { useYahooStock } from "@/hooks/useYahooStock";
 import { useCommsecTransactions } from "@/hooks/useCommsecTransactions";
 
-import { match, toAUD, type CrossExchangeTickerSymbol } from "@/lib/lib";
+import { match, toAUD, type CrossExchangeTickerSymbol } from "@/store/lib";
 //import { useCommsecHoldings } from "@/hooks/useCommsecHoldings";
 import { ErrorView } from "./Error";
 import { Card } from "./Card";

@@ -1,4 +1,4 @@
-import { last, watchList, type CrossExchangeTickerSymbol } from "@/lib/lib";
+import { last, watchList, type CrossExchangeTickerSymbol } from "@/store/lib";
 import { useYahooStock } from "@/hooks/useYahooStock";
 
 import {

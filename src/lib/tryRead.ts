@@ -1,4 +1,4 @@
-import { error, UNIT, value, type Result, type Unit } from "./lib";
+import { error, UNIT, value, type Result, type Unit } from "../store/lib";
 
 export const tryJson = async <T>(
   file: Bun.BunFile,

@@ -1,4 +1,4 @@
-import { match, type CrossExchangeTickerSymbol } from "@/lib/lib";
+import { match, type CrossExchangeTickerSymbol } from "@/store/lib";
 import { useYahooStock } from "@/hooks/useYahooStock";
 //import { useCommsecHoldings } from "@/hooks/useCommsecHoldings";
 import { ErrorView } from "./Error";

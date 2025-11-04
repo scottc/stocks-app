@@ -1,4 +1,4 @@
-import { error, value } from "@/lib/lib";
+import { error, value } from "@/store/lib";
 import { type HttpResult, tryFetchJson } from "@/lib/tryFetch";
 import { tryJson } from "@/lib/tryRead";
 import { tryWrite } from "@/lib/tryWrite";

@@ -2,7 +2,7 @@ import { file, write } from "bun";
 import { join } from "path";
 import { mkdirSync } from "fs";
 import { readdir } from "fs/promises";
-import { error, value, type Result } from "@/lib/lib";
+import { error, value, type Result } from "@/store/lib";
 
 interface ASXListedSecurities {
   datetime: string;

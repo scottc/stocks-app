@@ -1,6 +1,6 @@
 import { file } from "bun";
 import { join } from "path";
-import { value } from "@/lib/lib";
+import { value } from "@/store/lib";
 import { NEWS_SENTIMENT } from "./NEWS_SENTIMENT";
 import type { HttpResult } from "@/lib/tryFetch";
 

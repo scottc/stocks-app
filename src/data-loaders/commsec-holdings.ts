@@ -1,4 +1,4 @@
-import { error, value, type Result } from "@/lib/lib";
+import { error, value, type Result } from "@/store/lib";
 import { readdir, readFile } from "fs/promises";
 import { join } from "path";
 

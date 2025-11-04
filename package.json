@@ -13,10 +13,15 @@
   },
   "dependencies": {
     "@elysiajs/eden": "^1.4.4",
+    "@statelyai/inspect": "^0.4.0",
+    "@tanstack/react-router": "^1.134.12",
+    "@xstate/react": "^6.0.0",
     "echarts-for-react": "^3.0.2",
     "elysia": "^1.4.13",
+    "ollama": "^0.6.2",
     "react": "^19",
-    "react-dom": "^19"
+    "react-dom": "^19",
+    "xstate": "^5.24.0"
   },
   "devDependencies": {
     "@types/bun": "latest",

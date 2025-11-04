@@ -1,17 +1,13 @@
-import {
-  calculateScottScore,
-  type Candlestick,
-  type ScottScoreWeights,
-} from "@/fin/scottScore";
+import { calculateScottScore, type Candlestick } from "@/fin/scottScore";
 import { useYahooStock } from "@/hooks/useYahooStock";
 import {
-  toDecimalAU,
   toIntegerAU,
   toPercentAU,
   type CrossExchangeTickerSymbol,
-} from "@/lib/lib";
+} from "@/store/lib";
 import { Card } from "./Card";
-import { useState } from "react";
+import { useMachine, useSelector } from "@xstate/react";
+import { actor } from "@/store";
 
 interface ScoreProps {
   ticker: CrossExchangeTickerSymbol;
@@ -19,18 +15,8 @@ interface ScoreProps {
 
 const ScoreCard: React.FC<ScoreProps> = (props) => {
   const yh = useYahooStock({ symbol: props.ticker.yahoo });
-  const [weights, setWeights] = useState<ScottScoreWeights>({
-    // Biases, how important are each of these factors, in relevence to each other.
-    // should be a total sum of 1.0...
-    proven: 0.5,
-    returns: 0.3,
-    risk: 0.15,
-    liquidity: 0.05,
-  });
-
   const yts = yh.value?.chart.result.at(0)?.timestamp ?? [];
   const yq = yh.value?.chart.result.at(0)?.indicators?.quote.at(0);
-
   const cs = yts
     .map<Candlestick>((v, i, a) => ({
       timestamp: v,
@@ -42,9 +28,8 @@ const ScoreCard: React.FC<ScoreProps> = (props) => {
     }))
     .filter((x) => x.volume !== 0);
 
+  const weights = useSelector(actor, (s) => s.context.weights);
   const scottScore = calculateScottScore(cs, weights);
-
-  const digits = 5;
 
   return (
     <Card>
@@ -187,74 +172,68 @@ const ScoreCard: React.FC<ScoreProps> = (props) => {
         <br />
         <Score score={scottScore.compositeScore} />
       </p>
-
-      <h3>Weights</h3>
-
-      <div
-        style={{
-          width: "100%",
-          display: "grid",
-          gridTemplateColumns: "25% 25% 25% 25%",
-          gridTemplateRows: "auto",
-        }}
-      >
-        <div>
-          <label>Track Record:</label>
-          <br />
-          <input
-            style={{ width: "80%" }}
-            type="number"
-            value={weights.proven}
-            step={0.01}
-            onChange={(e) =>
-              setWeights({ ...weights, proven: parseFloat(e.target.value) })
-            }
-          />
-        </div>
-
-        <div>
-          <label>Returns:</label>
-          <br />
-          <input
-            style={{ width: "80%" }}
-            type="number"
-            value={weights.returns}
-            step={0.01}
-            onChange={(e) =>
-              setWeights({ ...weights, returns: parseFloat(e.target.value) })
-            }
-          />
-        </div>
-
-        <div>
-          <label>Risk Score:</label>
-          <br />
-          <input
-            style={{ width: "80%" }}
-            type="number"
-            value={weights.risk}
-            step={0.01}
-            onChange={(e) =>
-              setWeights({ ...weights, risk: parseFloat(e.target.value) })
-            }
-          />
-        </div>
-
-        <div>
-          <label>Liquidity:</label>
-          <br />
-          <input
-            style={{ width: "80%" }}
-            type="number"
-            value={weights.liquidity}
-            step={0.01}
-            onChange={(e) =>
-              setWeights({ ...weights, liquidity: parseFloat(e.target.value) })
-            }
-          />
-        </div>
-      </div>
     </Card>
+  );
+};
+
+export const Weights: React.FC<{}> = () => {
+  const weights = useSelector(actor, (s) => s.context.weights);
+  const send = actor.send;
+
+  return (
+    <>
+      <label>Track Record:</label>
+      <input
+        type="number"
+        value={weights.proven}
+        step={0.01}
+        onChange={(e) =>
+          send({
+            type: "weights.change",
+            value: { ...weights, proven: parseFloat(e.target.value) },
+          })
+        }
+      />
+
+      <label>Returns:</label>
+      <input
+        type="number"
+        value={weights.returns}
+        step={0.01}
+        onChange={(e) =>
+          send({
+            type: "weights.change",
+            value: { ...weights, returns: parseFloat(e.target.value) },
+          })
+        }
+      />
+
+      <label>Risk Score:</label>
+      <input
+        type="number"
+        value={weights.risk}
+        step={0.01}
+        onChange={(e) =>
+          send({
+            type: "weights.change",
+            value: { ...weights, risk: parseFloat(e.target.value) },
+          })
+        }
+      />
+
+      <label>Liquidity:</label>
+      <input
+        type="number"
+        value={weights.liquidity}
+        step={0.01}
+        onChange={(e) =>
+          send({
+            type: "weights.change",
+            value: { ...weights, liquidity: parseFloat(e.target.value) },
+          })
+        }
+      />
+    </>
   );
 };
 

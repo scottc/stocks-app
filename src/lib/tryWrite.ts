@@ -1,5 +1,5 @@
 import { write } from "bun";
-import { error, value, type Result } from "./lib";
+import { error, value, type Result } from "../store/lib";
 
 type WriteOptions = {
   mode?: number;

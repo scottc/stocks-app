@@ -18,7 +18,7 @@ export const Disclaimer: React.FC<{}> = () => {
         This is not financial advice! Always consult expert certified financial
         advice!
       </div>
-      <div style={{ height: "48px" }}></div>
+      <div style={{ height: "40px" }}></div>
     </>
   );
 };

@@ -225,6 +225,9 @@ const watchList: CrossExchangeTickerSymbol[] = [
     commsec: "HYGG",
     yahoo: "HYGG.AX",
   },
+];
+
+const other = [
   {
     commsec: "AAA",
     yahoo: "AAA.AX",
@@ -263,9 +266,6 @@ const watchList: CrossExchangeTickerSymbol[] = [
     commsec: "TRIL",
     yahoo: "TRIL",
   },
-];
-
-const other = [
   {
     // Vangard Global Big, Medium & Small Cap
     commsec: "VTI",

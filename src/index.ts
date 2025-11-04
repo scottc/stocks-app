@@ -1,4 +1,4 @@
-import { Elysia } from "elysia";
+import { Elysia } from "elysia"; // TODO: use solidstart instead. Because client side isomorphic routing & client intergration.
 import index from "./index.html";
 
 import { yahooApiFetch } from "./data-loaders/yahoo-finance-charts";

@@ -1,77 +1,28 @@
-import { useLlama, useOllamaChat } from "@/hooks/useLlama";
-import { useYahooStock } from "@/hooks/useYahooStock";
-import { Card } from "./Card";
+import { useOllamaChat, type Message } from "@/hooks/useLlama";
+import { actor } from "@/store";
+import { useSelector } from "@xstate/react";
 import { useState } from "react";
 
-export function LlamaAnalyzer({ symbol }: { symbol: string }) {
-  const yahooResult = useYahooStock({ symbol });
-
-  const { response, isLoading, error: llamaError, ask } = useLlama();
-
-  const quote = yahooResult.value?.chart.result[0]?.indicators.quote[0];
-  // const meta = yahooResult.value?.chart.result[0]?.meta;
-  const close = quote?.close ?? [];
-  const volume = quote?.volume ?? [];
-
-  //20-DAY HIGH: $${Math.max(...quote.high).toFixed(2)}
-  //20-DAY LOW: $${Math.min(...quote.low).toFixed(2)}
-  //MARKET CAP: $${(meta.marketCap / 1e9).toFixed(2)}B
-
-  const prompt = `You are a professional ASX portfolio manager.
-
-SYMBOL: ${symbol}
-
-CURRENT PRICE: $${close.at(-1)?.toFixed(2)}
-CHANGE: ${(((close.at(-1)! - close.at(-2)!) / close.at(-2)!) * 100).toFixed(2)}%
-VOLUME: ${volume.at(-1)?.toLocaleString()}
-
-You have $10,000 invested.
-Suggest:
-1. Buy, sell, or hold?
-2. Target price in 3 months?
-3. Risk level?
-4. One-sentence reasoning.
-
-Answer in 4 bullet points.`;
-
-  return (
-    <Card>
-      <h2>AI Analysis: {symbol}</h2>
-
-      {llamaError && (
-        <div className="p-3 bg-red-100 text-red-700 rounded mb-4">
-          Error: {llamaError}
-        </div>
-      )}
-
-      {response && !isLoading && (
-        <textarea rows={20} cols={50}>
-          {response}
-        </textarea>
-      )}
-
-      <h3>Prompt:</h3>
-      <textarea rows={20} cols={50}>
-        {prompt}
-      </textarea>
-
-      <div>
-        <button onClick={() => ask(prompt)} disabled={isLoading}>
-          {isLoading ? "Analyzing..." : "Analyze"}
-        </button>
-      </div>
-    </Card>
-  );
-}
-
 export const LlamaChat = () => {
-  const { messages, pendingContent, sendMessage, isLoading, error } =
-    useOllamaChat({
-      model: "llama3.1:8b-instruct-q4_K_M", // Match your model
-    });
   const [input, setInput] = useState("");
 
-  console.log(pendingContent, isLoading, error, messages);
+  const ip = useSelector(actor, (s) => s.context.ai.input);
+
+  const model = "llama3.1:8b-instruct-q4_K_M";
+  const {
+    messages,
+    pendingContent,
+    sendMessage,
+    isLoading,
+    error,
+    cancelRequest,
+    clearMessages,
+  } = useOllamaChat({
+    model: model,
+  });
+
+  // Optional: Remove this in production
+  console.log("State Debug:", { pendingContent, isLoading, error, messages });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -84,36 +35,215 @@ export const LlamaChat = () => {
     }
   };
 
-  // Helper to render messages, with live pending at the end
+  // Helper to render messages with role-specific styling and tool handling
   const renderMessages = () => {
-    return messages.map((msg, idx) => {
+    return messages.map((msg: Message, idx: number) => {
+      const isLast = idx === messages.length - 1;
       const isPending =
-        idx === messages.length - 1 &&
-        msg.role === "assistant" &&
-        pendingContent;
-      const key = `${msg.role}-${idx}-${msg.content?.length || 0}`; // Stable key for re-renders
+        isLast && msg.role === "assistant" && pendingContent && isLoading;
+      const key = `${msg.role}-${idx}-${msg.content?.length || 0}-${pendingContent?.length || 0}`;
 
-      return (
-        <div key={key} className={`message ${msg.role}`}>
-          {JSON.stringify(msg)}
-          {msg.content || (isPending ? pendingContent : "")}
-          {msg.tool_calls && (
-            <pre>{JSON.stringify(msg.tool_calls, null, 2)}</pre>
-          )}
-          {isPending && <span className="typing-indicator">▋</span>}{" "}
-          {/* Optional cursor */}
-        </div>
-      );
+      // Determine content to display (handles pending for assistants)
+      let displayContent = msg.content || "";
+      if (isPending) {
+        displayContent += pendingContent; // Append live stream to assistant
+      }
+
+      // Role-specific rendering
+      switch (msg.role) {
+        case "user":
+          return (
+            <div key={key} className="message user">
+              <strong>You:</strong> {displayContent}
+            </div>
+          );
+        case "assistant":
+          return (
+            <div key={key} className="message assistant">
+              <strong>Assistant:</strong> {displayContent}
+              {msg.tool_calls && msg.tool_calls.length > 0 && (
+                <details className="tool-calls">
+                  <summary>🛠️ Tool Calls ({msg.tool_calls.length})</summary>
+                  <pre>{JSON.stringify(msg.tool_calls, null, 2)}</pre>
+                </details>
+              )}
+              {isPending && <span className="typing-indicator">▋</span>}
+            </div>
+          );
+        case "tool":
+          return (
+            <div key={key} className="message tool">
+              <strong>Tool Result:</strong> {displayContent}
+              {msg.tool_call_id && <small> (ID: {msg.tool_call_id})</small>}
+            </div>
+          );
+        case "system":
+        default:
+          return (
+            <div key={key} className="message system">
+              <em>System: {displayContent}</em>
+            </div>
+          );
+      }
     });
   };
 
+  const handleClear = () => {
+    clearMessages();
+    setInput("");
+  };
+
   return (
-    <div>
+    <div className="llama-chat">
+      <style>{`
+        .llama-chat {
+          max-width: 600px;
+          margin: 0 auto;
+          font-family: Arial, sans-serif;
+          color: #e0e0e0; /* Base text color for dark mode */
+        }
+        .chat-history {
+          height: 400px;
+          overflow-y: auto;
+          border: 1px solid #333;
+          padding: 10px;
+          margin-bottom: 10px;
+          background: #1e1e1e;
+        }
+        .message {
+          margin-bottom: 10px;
+          padding: 8px;
+          border-radius: 8px;
+        }
+        .user {
+          background: #0d47a1;
+          text-align: right;
+          color: #e3f2fd;
+        }
+        .assistant {
+          background: #4a148c;
+          color: #f3e5f5;
+        }
+        .tool {
+          background: #2a2a2a;
+          font-size: 0.9em;
+          border-left: 3px solid #ff9800;
+          color: #ffcc80;
+        }
+        .system {
+          background: #424242;
+          font-size: 0.8em;
+          color: #9e9e9e;
+        }
+        .tool-calls {
+          margin-top: 5px;
+        }
+        .tool-calls summary {
+          cursor: pointer;
+          font-weight: bold;
+        }
+        .typing-indicator {
+          animation: blink 1s infinite;
+          color: #90caf9;
+        }
+        @keyframes blink {
+          0%,
+          50% {
+            opacity: 1;
+          }
+          51%,
+          100% {
+            opacity: 0;
+          }
+        }
+        form {
+          display: flex;
+          gap: 10px;
+        }
+        input {
+          flex: 1;
+          padding: 10px;
+          border: 1px solid #555;
+          border-radius: 4px;
+          background: #2a2a2a;
+          color: #e0e0e0;
+        }
+        button {
+          padding: 10px 20px;
+          background: #1e88e5;
+          color: white;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+        }
+        button:disabled {
+          background: #424242;
+          cursor: not-allowed;
+          color: #757575;
+        }
+        .error {
+          color: #ffcdd2;
+          background: #b71c1c;
+          padding: 10px;
+          border-radius: 4px;
+          margin: 10px 0;
+        }
+        .thinking {
+          text-align: center;
+          color: #aaa;
+          font-style: italic;
+        }
+        .clear-btn {
+          background: #d32f2f;
+          margin-left: 10px;
+          padding: 5px 10px;
+          font-size: 0.8em;
+          color: white;
+        }
+      `}</style>
+
+      <div>
+        Model:{" "}
+        <select>
+          <option>{model}</option>
+        </select>
+      </div>
+
+      <div>
+        Tools:
+        <br />
+        <label>
+          <input type="checkbox" checked={true}></input>
+          Weather Forcast
+        </label>
+        <br />
+        <label>
+          <input type="checkbox"></input>
+          Internet Search
+        </label>
+        <br />
+        <label>
+          <input type="checkbox"></input>
+          Check Brokerage Holdings
+        </label>
+        <br />
+        <label>
+          <input type="checkbox"></input>
+          Check Brokerage Transactions
+        </label>
+        <br />
+        <label>
+          <input type="checkbox"></input>
+          Check Stock Market
+        </label>
+      </div>
+
       <div className="chat-history">
-        {pendingContent}
         {renderMessages()}
-        {isLoading && !pendingContent && <div>Thinking...</div>}
-        {error && <div className="error">{error}</div>}
+        {isLoading && !pendingContent && (
+          <div className="thinking">Thinking...</div>
+        )}
+        {error && <div className="error">Error: {error}</div>}
       </div>
       <form onSubmit={handleSubmit}>
         <input
@@ -123,8 +253,21 @@ export const LlamaChat = () => {
           disabled={isLoading}
         />
         <button type="submit" disabled={isLoading || !input.trim()}>
-          Send
+          {isLoading ? "Sending..." : "Send"}
         </button>
+        <button
+          type="button"
+          className="clear-btn"
+          onClick={handleClear}
+          disabled={isLoading}
+        >
+          Clear
+        </button>
+        {isLoading && (
+          <button type="button" onClick={cancelRequest} className="clear-btn">
+            Cancel
+          </button>
+        )}
       </form>
     </div>
   );

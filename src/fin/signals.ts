@@ -5,7 +5,7 @@
  * Designed for weekly or daily use — max 1 trade per ETF per week.
  */
 
-import { toPercentAU } from "@/lib/lib";
+import { toPercentAU } from "@/store/lib";
 
 /** "Open, High, Low, Close, and Volume", and we also include unix timestamp in ms.  */
 export interface OHLCVT {

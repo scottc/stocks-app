@@ -8,7 +8,7 @@ import {
   toDecimalAU,
   toPercentAU,
   type CrossExchangeTickerSymbol,
-} from "@/lib/lib";
+} from "@/store/lib";
 import React from "react";
 import { useYahooStock } from "@/hooks/useYahooStock";
 import { ErrorView } from "./Error";

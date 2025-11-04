@@ -1,5 +1,5 @@
 import EChartsReact, { type EChartsOption } from "echarts-for-react";
-import { match, type CrossExchangeTickerSymbol } from "@/lib/lib";
+import { match, type CrossExchangeTickerSymbol } from "@/store/lib";
 import type { YahooStockData } from "@/data-loaders/yahoo-finance-charts";
 import { useYahooStock } from "@/hooks/useYahooStock";
 import { ErrorView } from "./Error";

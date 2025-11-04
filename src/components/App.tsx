@@ -1,7 +1,6 @@
-import { useState } from "react";
 import "@/index.css";
 
-import { watchList } from "@/lib/lib";
+import { watchList } from "@/store/lib";
 
 import StockChart from "./StockChart";
 import StockTable from "./StockTable";
@@ -18,49 +17,24 @@ import {
   WalkForwardSimulation,
 } from "./Backtests";
 import { AsxSelect } from "./AsxSelect";
-import { ScoreCard } from "./Score";
+import { ScoreCard, Weights } from "./Score";
 import { Disclaimer } from "./Disclaimer";
+import { useSelector } from "@xstate/react";
+import { actor } from "@/store";
+import type { ReactNode } from "react";
 
 export function App() {
-  const [daysHistory, setDaysHistory] = useState(63);
+  const historyPeriod = useSelector(actor, (ss) => ss.context.historyPeriod);
 
   return (
     <>
       <Disclaimer />
-      <div
-        style={{
-          height: 40,
-          width: "100%",
-          position: "fixed",
-          backgroundColor: "rgba(0,0,0,0.4)",
-        }}
-      >
-        <select
-          value={daysHistory}
-          onChange={(e) => setDaysHistory(parseInt(e.target.value))}
-        >
-          <optgroup label="Period">
-            <option value="20">Past 20 trading days (~1 Month)</option>
-            <option value="63">
-              Past 63 trading days (1 Quater / ~3 Months)
-            </option>
-            <option value={252 * 1}>
-              Past {252 * 1} trading days (1 Year)
-            </option>
-            <option value={252 * 2}>
-              Past {252 * 2} trading days (2 Years)
-            </option>
-            <option value={252 * 5}>
-              Past {252 * 5} trading days (5 Years)
-            </option>
-            <option value={252 * 10}>
-              Past {252 * 10} trading days (10 Years)
-            </option>
-            <option value={99999999999}>MAX</option>
-          </optgroup>
-        </select>
-      </div>
-      <div style={{ height: 40 }}></div>
+
+      <Panel>
+        <PeriodSelect />
+        <Weights />
+        <LlamaChat />
+      </Panel>
 
       <div
         style={{
@@ -72,26 +46,19 @@ export function App() {
       >
         {watchList.map((symbol) => (
           <div key={symbol.yahoo}>
-            <LlamaChat />
-            <LlamaAnalyzer symbol="asd" />
-          </div>
-        ))}
-
-        {watchList.map((symbol) => (
-          <div key={symbol.yahoo}>
             <ScoreCard ticker={symbol} />
           </div>
         ))}
 
         {watchList.map((symbol) => (
           <div key={symbol.yahoo}>
-            <Signals symbol={symbol} history={daysHistory} />
+            <Signals symbol={symbol} history={historyPeriod} />
           </div>
         ))}
 
         {watchList.map((symbol) => (
           <div key={symbol.yahoo}>
-            <StockChart symbol={symbol} history={daysHistory} />
+            <StockChart symbol={symbol} history={historyPeriod} />
           </div>
         ))}
 
@@ -109,25 +76,25 @@ export function App() {
 
         {watchList.map((symbol) => (
           <div key={symbol.yahoo}>
-            <StockHoldings symbol={symbol} history={daysHistory} />
+            <StockHoldings symbol={symbol} history={historyPeriod} />
           </div>
         ))}
 
         {watchList.map((symbol) => (
           <div key={symbol.yahoo}>
-            <StockTransactions symbol={symbol} history={daysHistory} />
+            <StockTransactions symbol={symbol} history={historyPeriod} />
           </div>
         ))}
 
         {watchList.map((symbol) => (
           <div key={symbol.yahoo}>
-            <StockTable symbol={symbol} history={daysHistory} />
+            <StockTable symbol={symbol} history={historyPeriod} />
           </div>
         ))}
 
         {watchList.map((symbol) => (
           <div key={symbol.yahoo}>
-            <StockTicker symbol={symbol} history={daysHistory} />
+            <StockTicker symbol={symbol} history={historyPeriod} />
           </div>
         ))}
 
@@ -164,5 +131,49 @@ export function App() {
     </>
   );
 }
+
+const Panel: React.FC<{ children?: ReactNode }> = (props) => (
+  <>
+    <div
+      style={{
+        height: 40,
+        width: "33%",
+        position: "fixed",
+        right: 0,
+        backgroundColor: "#222",
+      }}
+    >
+      {props.children}
+    </div>
+  </>
+);
+
+const PeriodSelect: React.FC<{}> = () => {
+  const historyPeriod = useSelector(actor, (s) => s.context.historyPeriod);
+
+  return (
+    <select
+      value={historyPeriod}
+      onChange={(e) =>
+        actor.send({
+          type: "historyPeriod.change",
+          value: parseInt(e.target.value),
+        })
+      }
+    >
+      <optgroup label="Period">
+        <option value="20">Past 20 trading days (~1 Month)</option>
+        <option value="63">Past 63 trading days (1 Quater / ~3 Months)</option>
+        <option value={252 * 1}>Past {252 * 1} trading days (1 Year)</option>
+        <option value={252 * 2}>Past {252 * 2} trading days (2 Years)</option>
+        <option value={252 * 5}>Past {252 * 5} trading days (5 Years)</option>
+        <option value={252 * 10}>
+          Past {252 * 10} trading days (10 Years)
+        </option>
+        <option value={99999999999}>MAX</option>
+      </optgroup>
+    </select>
+  );
+};
 
 export default App;
