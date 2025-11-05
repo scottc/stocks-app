@@ -8,7 +8,7 @@ import StockTicker from "./StockTicker";
 import StockTransactions from "./StockTransactions";
 import StockHoldings from "./StockHoldings";
 import { CommsecLinks, YahooLinks } from "./CommsecLinks";
-import { LlamaAnalyzer, LlamaChat } from "./LlamaAnalyzer";
+import { LlamaChat } from "./LlamaAnalyzer";
 import Signals from "./Signals";
 import DerivedData from "./DerivedData";
 import {
@@ -28,8 +28,6 @@ export function App() {
 
   return (
     <>
-      <Disclaimer />
-
       <Panel>
         <PeriodSelect />
         <Weights />
@@ -141,12 +139,35 @@ const Panel: React.FC<{ children?: ReactNode }> = (props) => (
         position: "fixed",
         right: 0,
         backgroundColor: "#222",
+        borderLeft: "3px solid black",
       }}
     >
       {props.children}
     </div>
   </>
 );
+
+export const Toolbar: React.FC<{ children?: React.ReactNode }> = (props) => {
+  return (
+    <>
+      <div
+        style={{
+          position: "fixed",
+          zIndex: 999999999999999,
+          display: "block",
+          width: "100%",
+          height: "40px",
+          fontSize: "32px",
+          background: "#000",
+          color: "#fff",
+        }}
+      >
+        {props.children}
+      </div>
+      <div style={{ height: "40px" }}></div>
+    </>
+  );
+};
 
 const PeriodSelect: React.FC<{}> = () => {
   const historyPeriod = useSelector(actor, (s) => s.context.historyPeriod);

@@ -6,14 +6,17 @@ import { loadLatestTransactions } from "./data-loaders/commsec-transactions";
 import { loadHoldings } from "./data-loaders/commsec-holdings";
 import { fetchASXListedSecurities } from "./data-loaders/asx";
 import { cache, instance } from "./data-loaders/alpha-vantage";
+import { commsecEftScreener } from "./data-loaders/commsec/efts";
 
 //import stream from "./ssr-react";
 
 const app = new Elysia()
+  .get("/robots.txt", "")
   .get("/*", index)
   .get("/api/asx/listedcompanies", fetchASXListedSecurities)
   .get("/api/commsec/holdings", loadHoldings)
   .get("/api/commsec/transactions", loadLatestTransactions)
+  .get("/api/commsec/eftscreener", () => commsecEftScreener)
   .get("/api/alphavantage/LISTING_STATUS", () => cache)
   .get(
     "/api/alphavantage/NEWS_SENTIMENT/:tickers",

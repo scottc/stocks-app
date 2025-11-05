@@ -1,15 +1,14 @@
 import { type CSSProperties } from "react";
-import { useYahooStock } from "@/hooks/useYahooStock";
 import { useCommsecTransactions } from "@/hooks/useCommsecTransactions";
 
 import { match, toAUD, type CrossExchangeTickerSymbol } from "@/store/lib";
-//import { useCommsecHoldings } from "@/hooks/useCommsecHoldings";
 import { ErrorView } from "./Error";
 import { Card } from "./Card";
+import { Link } from "@tanstack/react-router";
 
-interface ChartComponentProps {
-  symbol: CrossExchangeTickerSymbol;
-  history: number;
+interface TransactionsProps {
+  symbol?: CrossExchangeTickerSymbol;
+  history?: number;
 }
 
 const style: CSSProperties = {
@@ -17,31 +16,20 @@ const style: CSSProperties = {
   borderCollapse: "collapse",
 };
 
-const ChartComponent = ({
+const Transactions = ({
   symbol,
   //history
-}: ChartComponentProps) => {
-  const stocks = useYahooStock({ symbol: symbol.yahoo });
-  //const holdings = useCommsecHoldings({});
+}: TransactionsProps) => {
   const transactions = useCommsecTransactions({});
-
-  //const relevantHoldings =
-  //  holdings.type === "value"
-  //    ? holdings.value.holdings.filter((x) => x.code === symbol.commsec)
-  //    : [];
-  //const purchasePrice = relevantHoldings.at(0)?.purchasePrice ?? 0;
-  //const availUnits = relevantHoldings.at(0)?.availUnits ?? 0;
 
   return (
     <Card>
-      <h2>Commsec {symbol.commsec} Transactions</h2>
+      <h2>Transactions</h2>
 
       {match(transactions, {
         init: () => <></>,
         loading: () => <></>,
         value: (v) => {
-          const relevant = v.filter((x) => x.details.includes(symbol.commsec));
-
           return (
             <>
               <table style={style}>
@@ -56,11 +44,13 @@ const ChartComponent = ({
                   </tr>
                 </thead>
                 <tbody>
-                  {relevant.map((t) => (
+                  {v.map((t) => (
                     <tr key={t.reference}>
                       <td>{t.date}</td>
                       <td>{t.reference}</td>
-                      <td>{t.details}</td>
+                      <td>
+                        <Details details={t.details} />
+                      </td>
                       <td>{toAUD(t.debit)}</td>
                       <td>{toAUD(t.credit)}</td>
                       <td>{toAUD(t.balance)}</td>
@@ -68,75 +58,6 @@ const ChartComponent = ({
                   ))}
                 </tbody>
               </table>
-            </>
-          );
-        },
-        error: (e) => <ErrorView error={e} />,
-      })}
-
-      {match(stocks, {
-        init: () => <></>,
-        error: (e) => <ErrorView error={e} />,
-        loading: () => <>{symbol.commsec} Loading...</>,
-        value: () => {
-          //const r = val.chart.result[0];
-          //const q = first(r?.indicators.quote);
-          //const meta = r?.meta;
-          //const currentPrice = last(q?.close) ?? 0;
-          //const profit = (currentPrice - purchasePrice) * availUnits;
-
-          //const style: CSSProperties = {
-          //  border: "2px solid rgb(140 140 140)",
-          //  borderCollapse: "collapse",
-          //};
-
-          return (
-            <>
-              {/* <h3>Transactions</h3>
-              <table style={style}>
-                <thead>
-                  <tr>
-                    <th>Date</th>
-                    <th>Reference</th>
-                    <th>Buy or Sell</th>
-                    <th>Units</th>
-                    <th>StockSymbol</th>
-                    <th>Price</th>
-                    <th>debit / credit / Balance</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>2025-10-24</td>
-                    <td>167683575</td>
-                    <td>B</td>
-                    <td>{toDecimalAU(initialStock)}</td>
-                    <td>{initialStockSymbol}</td>
-                    <td>{toAUD(initalBuyPrice)}</td>
-                    <td>{toAUD(initalBuyPrice * initialStock)}</td>
-                  </tr>
-                </tbody>
-              </table> */}
-
-              {/* <h3>Summary:</h3>
-              <p>
-                Total:
-                <br />
-                Investment: {toAUD(initalBuyPrice * initialStock)}
-                <br />
-                Units: {toDecimalAU(initialStock)}
-                <br />
-                Profit per Unit: {toAUD(currentPrice - initalBuyPrice)}
-                <br />
-                Profit per Day: {toAUD(0.0)}
-                <br />
-                Total Profit:{" "}
-                <span style={{ color: color(profit) }}>
-                  {icon(profit)}
-                  {toAUD(profit)} (
-                  {toPercentAU(pctDiff(currentPrice, initalBuyPrice))})
-                </span>
-              </p> */}
 
               <button
                 onClick={(_e) => alert("TODO: Implement missing feature.")}
@@ -157,9 +78,24 @@ const ChartComponent = ({
             </>
           );
         },
+        error: (e) => <ErrorView error={e} />,
       })}
     </Card>
   );
 };
 
-export default ChartComponent;
+const Details: React.FC<{ details: string }> = ({ details }) => {
+  const ds = details.split(" ");
+
+  return (
+    <>
+      {ds[0]} {ds[1]}{" "}
+      <Link to="/efts/$id" params={{ id: ds[2]?.toLowerCase() }}>
+        {ds[2]}
+      </Link>{" "}
+      {ds[3]} {ds[4]}
+    </>
+  );
+};
+
+export default Transactions;

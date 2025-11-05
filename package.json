@@ -6,17 +6,23 @@
   "type": "module",
   "scripts": {
     "dev": "bun serve",
-    "serve": "bun --hot src/index.ts",
+    "serve": "bun run watch-routes & bun --hot src/index.ts",
     "build": "bun build ./src/index.html --outdir=dist --sourcemap --target=browser --minify --define:process.env.NODE_ENV='\"production\"' --env='BUN_PUBLIC_*'",
+    "build2": "bun build ./src/index.tsx --outdir ./dist --target browser --format esm --splitting",
     "start": "NODE_ENV=production bun src/index.ts",
-    "lint": "bunx oxlint --type-aware"
+    "lint": "bunx oxlint --type-aware",
+    "generate-routes": "tsr generate",
+    "watch-routes": "tsr watch"
   },
   "dependencies": {
     "@elysiajs/eden": "^1.4.4",
     "@statelyai/inspect": "^0.4.0",
+    "@tanstack/react-devtools": "^0.8.0",
     "@tanstack/react-router": "^1.134.12",
+    "@tanstack/react-router-devtools": "^1.134.12",
+    "@tanstack/react-table": "^8.21.3",
     "@xstate/react": "^6.0.0",
-    "echarts-for-react": "^3.0.2",
+    "echarts": "^6.0.0",
     "elysia": "^1.4.13",
     "ollama": "^0.6.2",
     "react": "^19",
@@ -24,6 +30,7 @@
     "xstate": "^5.24.0"
   },
   "devDependencies": {
+    "@tanstack/router-cli": "^1.134.12",
     "@types/bun": "latest",
     "@types/react": "^19",
     "@types/react-dom": "^19",

@@ -4,10 +4,11 @@ import { useCommsecHoldings } from "@/hooks/useCommsecHoldings";
 import { match, type CrossExchangeTickerSymbol } from "@/store/lib";
 import { ErrorView } from "./Error";
 import { Card } from "./Card";
+import { Link } from "@tanstack/react-router";
 
-interface ChartComponentProps {
-  symbol: CrossExchangeTickerSymbol;
-  history: number;
+interface HoldingsProps {
+  symbol?: CrossExchangeTickerSymbol;
+  history?: number;
 }
 
 const style: CSSProperties = {
@@ -15,27 +16,18 @@ const style: CSSProperties = {
   borderCollapse: "collapse",
 };
 
-const StockHoldings = ({ symbol }: ChartComponentProps) => {
-  //const stocks = useYahooStock({ symbol: symbol.yahoo });
+const Holdings = ({ symbol }: HoldingsProps) => {
   const holdings = useCommsecHoldings({});
-  // const transactions = useCommsecTransactions({});
-
-  //const relevantHoldings =
-  //  holdings.type === "value"
-  //    ? holdings.value.holdings.filter((x) => x.code === symbol.commsec)
-  //    : [];
-  //const purchasePrice = relevantHoldings.at(0)?.purchasePrice ?? 0;
-  //const availUnits = relevantHoldings.at(0)?.availUnits ?? 0;
 
   return (
     <Card>
-      <h2>Commsec {symbol.commsec} Holdings</h2>
+      <h2>Holdings</h2>
 
       {match(holdings, {
         init: () => <></>,
         loading: () => <></>,
         value: (v) => {
-          const relevant = v.holdings.filter((x) => x.code === symbol.commsec);
+          //const relevant = v.holdings.filter((x) => x.code === symbol.commsec);
 
           return (
             <>
@@ -58,12 +50,19 @@ const StockHoldings = ({ symbol }: ChartComponentProps) => {
                   </tr>
                 </thead>
                 <tbody>
-                  {relevant.map((h) => (
+                  {v.holdings.map((h) => (
                     <tr key={h.code} /* TODO: is this key unique? */>
                       <td>{h.availUnits}</td>
                       <td>{h.changePercent}</td>
                       <td>{h.changePrice}</td>
-                      <td>{h.code}</td>
+                      <td>
+                        <Link
+                          to="/efts/$id"
+                          params={{ id: h.code.toLowerCase() }}
+                        >
+                          {h.code}
+                        </Link>
+                      </td>
                       <td>{h.lastPrice}</td>
                       <td>{h.marketValue}</td>
                       <td>{h.profitLoss}</td>
@@ -113,4 +112,4 @@ const StockHoldings = ({ symbol }: ChartComponentProps) => {
   );
 };
 
-export default StockHoldings;
+export default Holdings;

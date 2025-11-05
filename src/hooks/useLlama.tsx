@@ -22,27 +22,19 @@ const executeTool = async (toolCall: ToolCall): Promise<string> => {
     throw new Error(`Invalid tool arguments: ${argsStr}`);
   }
 
+  // TODO: from local cache...
   switch (name) {
-    case "get_temperature": {
-      const city = args.city || "Unknown";
-      // Mock data—replace with your TS API fetch
-      const mockTemps: Record<string, string> = {
-        "New York": "22°C",
-        London: "15°C",
-        Tokyo: "28°C",
-      };
-      const temp = mockTemps[city] || "Unknown";
-      return `Temperature in ${city}: ${temp}`;
-    }
     case "get_holdings": {
       return JSON.stringify(await client.api.commsec.holdings.get());
     }
     case "get_transactions": {
       return JSON.stringify(await client.api.commsec.transactions.get());
     }
-    //case "get_stock": {
-    //return JSON.stringify(await client.api.yahoo.chart.get();
-    //}
+    case "get_stock": {
+      return JSON.stringify(
+        await client.api.yahoo.chart({ symbol: args.symbol }).get(),
+      );
+    }
     default:
       throw new Error(`Unknown tool: ${name}`);
   }
@@ -53,16 +45,16 @@ const DEFAULT_TOOLS: Tool[] = [
   {
     type: "function",
     function: {
-      name: "get_temperature",
+      name: "get_stock",
       description:
-        "Get the current temperature for a given city via the custom API",
+        "Get the stock for a given ticker symbol code via the custom API",
       parameters: {
         type: "object",
-        required: ["city"],
+        required: ["symbol"],
         properties: {
-          city: {
+          symbol: {
             type: "string",
-            description: 'The name of the city (e.g., "New York")',
+            description: 'The symbol of the stock (e.g., "IOO")',
           },
         },
       },

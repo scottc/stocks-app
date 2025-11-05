@@ -1,4 +1,4 @@
-import { useOllamaChat, type Message } from "@/hooks/useLlama";
+import { useOllamaChat } from "@/hooks/useLlama";
 import { actor } from "@/store";
 import { useSelector } from "@xstate/react";
 import { useState } from "react";
@@ -37,7 +37,7 @@ export const LlamaChat = () => {
 
   // Helper to render messages with role-specific styling and tool handling
   const renderMessages = () => {
-    return messages.map((msg: Message, idx: number) => {
+    return messages.map((msg, idx) => {
       const isLast = idx === messages.length - 1;
       const isPending =
         isLast && msg.role === "assistant" && pendingContent && isLoading;

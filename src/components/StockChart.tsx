@@ -1,10 +1,9 @@
-import EChartsReact, { type EChartsOption } from "echarts-for-react";
 import { match, type CrossExchangeTickerSymbol } from "@/store/lib";
 import type { YahooStockData } from "@/data-loaders/yahoo-finance-charts";
 import { useYahooStock } from "@/hooks/useYahooStock";
 import { ErrorView } from "./Error";
 import { Card } from "./Card";
-import WebGLCandlestickChart, { generateMockData, type Candle } from "./Chart";
+import WebGLCandlestickChart from "./Chart";
 
 interface ChartComponentProps {
   symbol: CrossExchangeTickerSymbol;
