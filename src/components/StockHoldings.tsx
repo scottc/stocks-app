@@ -57,7 +57,7 @@ const Holdings = ({ symbol }: HoldingsProps) => {
                       <td>{h.changePrice}</td>
                       <td>
                         <Link
-                          to="/efts/$id"
+                          to="/efts/$id/chart"
                           params={{ id: h.code.toLowerCase() }}
                         >
                           {h.code}

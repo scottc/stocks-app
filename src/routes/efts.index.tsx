@@ -92,7 +92,10 @@ const columns: (
     cell: (props) => (
       <>
         ASX:
-        <Link to="/efts/$id" params={{ id: props.getValue().toLowerCase() }}>
+        <Link
+          to="/efts/$id/chart"
+          params={{ id: props.getValue().toLowerCase() }}
+        >
           {props.getValue()}
         </Link>
       </>

@@ -85,6 +85,18 @@ function EftPage() {
 
       <h2 style={{ textAlign: "center" }}>{id.toUpperCase()}</h2>
 
+      <Link to="/efts/$id/table" params={{ id }}>
+        View Raw Data
+      </Link>
+      {" | "}
+      <Link to="/efts/$id/chart" params={{ id }}>
+        View Chart
+      </Link>
+      {" | "}
+      <Link to="/efts/$id/chart-webgpu" params={{ id }}>
+        WebGPU Experiment
+      </Link>
+
       <Outlet />
       {/*
 

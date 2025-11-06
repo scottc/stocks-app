@@ -47,7 +47,14 @@ const Transactions = ({
                   {v.map((t) => (
                     <tr key={t.reference}>
                       <td>{t.date}</td>
-                      <td>{t.reference}</td>
+                      <td>
+                        <Link
+                          to="/transactions/$id"
+                          params={{ id: t.reference }}
+                        >
+                          {t.reference}
+                        </Link>
+                      </td>
                       <td>
                         <Details details={t.details} />
                       </td>
@@ -90,7 +97,10 @@ const Details: React.FC<{ details: string }> = ({ details }) => {
   return (
     <>
       {ds[0]} {ds[1]}{" "}
-      <Link to="/efts/$id" params={{ id: ds[2]?.toLowerCase() }}>
+      <Link
+        to="/efts/$id/chart"
+        params={{ id: ds[2]?.toLowerCase() ?? "ID_NOT_FOUND" }}
+      >
         {ds[2]}
       </Link>{" "}
       {ds[3]} {ds[4]}

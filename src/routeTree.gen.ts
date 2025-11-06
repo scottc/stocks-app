@@ -9,18 +9,43 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as Page3RouteImport } from './routes/page3'
-import { Route as Page2RouteImport } from './routes/exchanges'
-import { Route as IndexRouteImport } from './ro./routes/exchanges/exchanges
+import { Route as SearchRouteImport } from './routes/search'
+import { Route as HoldingsRouteImport } from './routes/holdings'
+import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as CompareRouteImport } from './routes/compare'
+import { Route as AiRouteImport } from './routes/ai'
+import { Route as IndexRouteImport } from './routes/index'
+import { Route as TransactionsIndexRouteImport } from './routes/transactions.index'
+import { Route as EftsIndexRouteImport } from './routes/efts.index'
+import { Route as TransactionsIdRouteImport } from './routes/transactions.$id'
+import { Route as EftsIdRouteImport } from './routes/efts.$id'
+import { Route as EftsIdTableRouteImport } from './routes/efts.$id.table'
+import { Route as EftsIdChartWebgpuRouteImport } from './routes/efts.$id.chart-webgpu'
+import { Route as EftsIdChartRouteImport } from './routes/efts.$id.chart'
 
-const Page3Route = Page3RouteImport.update({./routes./routes/efts.indexnges.indexsactions/transactions.$transactionId
-  id: '/page3',./routes/transactions.index
-  path: '/page3',./routes/exchanges/$exchangeId/$exchangeId./routes/exchanges/$exchangeId/exchanges.$exchangeId.index
+const SearchRoute = SearchRouteImport.update({
+  id: '/search',
+  path: '/search',
   getParentRoute: () => rootRouteImport,
-} as any)./routes/efts.$id.chart
-const Page2Route = Page2RouteImport.update({
-  id: '/page2',
-  path: '/page2',./routes/efts.$id.chart-webgpu
+} as any)
+const HoldingsRoute = HoldingsRouteImport.update({
+  id: '/holdings',
+  path: '/holdings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CompareRoute = CompareRouteImport.update({
+  id: '/compare',
+  path: '/compare',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AiRoute = AiRouteImport.update({
+  id: '/ai',
+  path: '/ai',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -28,51 +53,184 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TransactionsIndexRoute = TransactionsIndexRouteImport.update({
+  id: '/transactions/',
+  path: '/transactions/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EftsIndexRoute = EftsIndexRouteImport.update({
+  id: '/efts/',
+  path: '/efts/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TransactionsIdRoute = TransactionsIdRouteImport.update({
+  id: '/transactions/$id',
+  path: '/transactions/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EftsIdRoute = EftsIdRouteImport.update({
+  id: '/efts/$id',
+  path: '/efts/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EftsIdTableRoute = EftsIdTableRouteImport.update({
+  id: '/table',
+  path: '/table',
+  getParentRoute: () => EftsIdRoute,
+} as any)
+const EftsIdChartWebgpuRoute = EftsIdChartWebgpuRouteImport.update({
+  id: '/chart-webgpu',
+  path: '/chart-webgpu',
+  getParentRoute: () => EftsIdRoute,
+} as any)
+const EftsIdChartRoute = EftsIdChartRouteImport.update({
+  id: '/chart',
+  path: '/chart',
+  getParentRoute: () => EftsIdRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/page2': typeof Page2Route
-  '/page3': typeof Page3Route
+  '/ai': typeof AiRoute
+  '/compare': typeof CompareRoute
+  '/dashboard': typeof DashboardRoute
+  '/holdings': typeof HoldingsRoute
+  '/search': typeof SearchRoute
+  '/efts/$id': typeof EftsIdRouteWithChildren
+  '/transactions/$id': typeof TransactionsIdRoute
+  '/efts': typeof EftsIndexRoute
+  '/transactions': typeof TransactionsIndexRoute
+  '/efts/$id/chart': typeof EftsIdChartRoute
+  '/efts/$id/chart-webgpu': typeof EftsIdChartWebgpuRoute
+  '/efts/$id/table': typeof EftsIdTableRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/page2': typeof Page2Route
-  '/page3': typeof Page3Route
+  '/ai': typeof AiRoute
+  '/compare': typeof CompareRoute
+  '/dashboard': typeof DashboardRoute
+  '/holdings': typeof HoldingsRoute
+  '/search': typeof SearchRoute
+  '/efts/$id': typeof EftsIdRouteWithChildren
+  '/transactions/$id': typeof TransactionsIdRoute
+  '/efts': typeof EftsIndexRoute
+  '/transactions': typeof TransactionsIndexRoute
+  '/efts/$id/chart': typeof EftsIdChartRoute
+  '/efts/$id/chart-webgpu': typeof EftsIdChartWebgpuRoute
+  '/efts/$id/table': typeof EftsIdTableRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/page2': typeof Page2Route
-  '/page3': typeof Page3Route
+  '/ai': typeof AiRoute
+  '/compare': typeof CompareRoute
+  '/dashboard': typeof DashboardRoute
+  '/holdings': typeof HoldingsRoute
+  '/search': typeof SearchRoute
+  '/efts/$id': typeof EftsIdRouteWithChildren
+  '/transactions/$id': typeof TransactionsIdRoute
+  '/efts/': typeof EftsIndexRoute
+  '/transactions/': typeof TransactionsIndexRoute
+  '/efts/$id/chart': typeof EftsIdChartRoute
+  '/efts/$id/chart-webgpu': typeof EftsIdChartWebgpuRoute
+  '/efts/$id/table': typeof EftsIdTableRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/page2' | '/page3'
+  fullPaths:
+    | '/'
+    | '/ai'
+    | '/compare'
+    | '/dashboard'
+    | '/holdings'
+    | '/search'
+    | '/efts/$id'
+    | '/transactions/$id'
+    | '/efts'
+    | '/transactions'
+    | '/efts/$id/chart'
+    | '/efts/$id/chart-webgpu'
+    | '/efts/$id/table'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/page2' | '/page3'
-  id: '__root__' | '/' | '/page2' | '/page3'
+  to:
+    | '/'
+    | '/ai'
+    | '/compare'
+    | '/dashboard'
+    | '/holdings'
+    | '/search'
+    | '/efts/$id'
+    | '/transactions/$id'
+    | '/efts'
+    | '/transactions'
+    | '/efts/$id/chart'
+    | '/efts/$id/chart-webgpu'
+    | '/efts/$id/table'
+  id:
+    | '__root__'
+    | '/'
+    | '/ai'
+    | '/compare'
+    | '/dashboard'
+    | '/holdings'
+    | '/search'
+    | '/efts/$id'
+    | '/transactions/$id'
+    | '/efts/'
+    | '/transactions/'
+    | '/efts/$id/chart'
+    | '/efts/$id/chart-webgpu'
+    | '/efts/$id/table'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  Page2Route: typeof Page2Route
-  Page3Route: typeof Page3Route
+  AiRoute: typeof AiRoute
+  CompareRoute: typeof CompareRoute
+  DashboardRoute: typeof DashboardRoute
+  HoldingsRoute: typeof HoldingsRoute
+  SearchRoute: typeof SearchRoute
+  EftsIdRoute: typeof EftsIdRouteWithChildren
+  TransactionsIdRoute: typeof TransactionsIdRoute
+  EftsIndexRoute: typeof EftsIndexRoute
+  TransactionsIndexRoute: typeof TransactionsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/page3': {
-      id: '/page3'
-      path: '/page3'
-      fullPath: '/page3'
-      preLoaderRoute: typeof Page3RouteImport
+    '/search': {
+      id: '/search'
+      path: '/search'
+      fullPath: '/search'
+      preLoaderRoute: typeof SearchRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/page2': {
-      id: '/page2'
-      path: '/page2'
-      fullPath: '/page2'
-      preLoaderRoute: typeof Page2RouteImport
+    '/holdings': {
+      id: '/holdings'
+      path: '/holdings'
+      fullPath: '/holdings'
+      preLoaderRoute: typeof HoldingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/compare': {
+      id: '/compare'
+      path: '/compare'
+      fullPath: '/compare'
+      preLoaderRoute: typeof CompareRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ai': {
+      id: '/ai'
+      path: '/ai'
+      fullPath: '/ai'
+      preLoaderRoute: typeof AiRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -82,13 +240,84 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/transactions/': {
+      id: '/transactions/'
+      path: '/transactions'
+      fullPath: '/transactions'
+      preLoaderRoute: typeof TransactionsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/efts/': {
+      id: '/efts/'
+      path: '/efts'
+      fullPath: '/efts'
+      preLoaderRoute: typeof EftsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/transactions/$id': {
+      id: '/transactions/$id'
+      path: '/transactions/$id'
+      fullPath: '/transactions/$id'
+      preLoaderRoute: typeof TransactionsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/efts/$id': {
+      id: '/efts/$id'
+      path: '/efts/$id'
+      fullPath: '/efts/$id'
+      preLoaderRoute: typeof EftsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/efts/$id/table': {
+      id: '/efts/$id/table'
+      path: '/table'
+      fullPath: '/efts/$id/table'
+      preLoaderRoute: typeof EftsIdTableRouteImport
+      parentRoute: typeof EftsIdRoute
+    }
+    '/efts/$id/chart-webgpu': {
+      id: '/efts/$id/chart-webgpu'
+      path: '/chart-webgpu'
+      fullPath: '/efts/$id/chart-webgpu'
+      preLoaderRoute: typeof EftsIdChartWebgpuRouteImport
+      parentRoute: typeof EftsIdRoute
+    }
+    '/efts/$id/chart': {
+      id: '/efts/$id/chart'
+      path: '/chart'
+      fullPath: '/efts/$id/chart'
+      preLoaderRoute: typeof EftsIdChartRouteImport
+      parentRoute: typeof EftsIdRoute
+    }
   }
 }
 
+interface EftsIdRouteChildren {
+  EftsIdChartRoute: typeof EftsIdChartRoute
+  EftsIdChartWebgpuRoute: typeof EftsIdChartWebgpuRoute
+  EftsIdTableRoute: typeof EftsIdTableRoute
+}
+
+const EftsIdRouteChildren: EftsIdRouteChildren = {
+  EftsIdChartRoute: EftsIdChartRoute,
+  EftsIdChartWebgpuRoute: EftsIdChartWebgpuRoute,
+  EftsIdTableRoute: EftsIdTableRoute,
+}
+
+const EftsIdRouteWithChildren =
+  EftsIdRoute._addFileChildren(EftsIdRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  Page2Route: Page2Route,
-  Page3Route: Page3Route,
+  AiRoute: AiRoute,
+  CompareRoute: CompareRoute,
+  DashboardRoute: DashboardRoute,
+  HoldingsRoute: HoldingsRoute,
+  SearchRoute: SearchRoute,
+  EftsIdRoute: EftsIdRouteWithChildren,
+  TransactionsIdRoute: TransactionsIdRoute,
+  EftsIndexRoute: EftsIndexRoute,
+  TransactionsIndexRoute: TransactionsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
