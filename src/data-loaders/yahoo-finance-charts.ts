@@ -90,6 +90,7 @@ const memoryCache = new Map<
 
 const yahooApiFetch = async (
   yahooSymbol: string,
+  interval: "1d" | "1m",
 ): Promise<Result<YahooStockData>> => {
   try {
     if (yahooSymbol === "unknown") {
@@ -107,7 +108,7 @@ const yahooApiFetch = async (
       return value(memEntry.data);
     }
 
-    const cacheSubDir = join(CACHE_DIR, yahooSymbol);
+    const cacheSubDir = join(CACHE_DIR, yahooSymbol, interval);
 
     // Ensure ticker directory exists
     mkdirSync(cacheSubDir, { recursive: true });
@@ -145,8 +146,14 @@ const yahooApiFetch = async (
       }
     }
 
+    // 1-minute, must be within last 30 days....
+    // https://query1.finance.yahoo.com/v8/finance/chart/IOO.AX?events=capitalGain%7Cdiv%7Csplit&formatted=true&includeAdjustedClose=true&interval=1m&period1=1762316747&period2=1762426747&symbol=IOO.AX&userYfid=true&lang=en-AU&region=AU
+
+    const period1 = interval === "1d" ? 0 : now - 60 * 60 * (24 * 7);
+    const period2 = interval === "1d" ? 9999999999 : now;
+
     // https://query1.finance.yahoo.com/v8/finance/chart/IOO.AX?events=capitalGain%7Cdiv%7Csplit&formatted=true&includeAdjustedClose=true&interval=1d&period1=1199228400&period2=1761709580&symbol=IOO.AX&userYfid=true&lang=en-US&region=US
-    const yahooUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${yahooSymbol}?period1=0&period2=9999999999&interval=1d&includePrePost=false&includeAdjustedClose=true&events=div%7Csplit`;
+    const yahooUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${yahooSymbol}?period1=${period1}&period2=${period2}&interval=${interval}&includePrePost=false&includeAdjustedClose=true&events=div%7Csplit`;
     console.log(`[Network] Fetching from Yahoo Finance: ${yahooUrl}`);
     const response = await fetch(yahooUrl, {
       headers: {
@@ -162,13 +169,12 @@ const yahooApiFetch = async (
     const data = await response.json();
 
     // Save to cache
-    const timestamp = Math.floor(Date.now() / 1000);
-    const cacheFilePath = join(cacheSubDir, `${timestamp}.json`);
+    const cacheFilePath = join(cacheSubDir, `${now}.json`);
     await write(file(cacheFilePath), JSON.stringify(data));
     console.log(`[Disk] Cached yahoo data to ${cacheFilePath}`);
 
     // Save to in-memory cache
-    memoryCache.set(yahooSymbol, { data, timestamp });
+    memoryCache.set(yahooSymbol, { data, timestamp: now });
     console.log(`[Memory] Cached yahoo data for ${yahooSymbol}`);
 
     return value(data);

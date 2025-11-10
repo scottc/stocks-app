@@ -15,6 +15,8 @@ const RootLayout = () => (
       {" | "}
       <Link to="/efts">EFTs</Link>
       {" | "}
+      <Link to="/sectors">Sectors</Link>
+      {" | "}
       <Link to="/compare">Compare</Link>
       {" | "}
       <Link to="/ai">AI</Link>

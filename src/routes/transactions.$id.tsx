@@ -1,7 +1,6 @@
 import client from "@/client";
 import { Card } from "@/components/Card";
-import type { YahooStockData } from "@/data-loaders/yahoo-finance-charts";
-import { toAUD, toDecimalAU } from "@/store/lib";
+import { toAUD } from "@/store/lib";
 import {
   createFileRoute,
   Link,
@@ -20,7 +19,9 @@ export const Route = createFileRoute("/transactions/$id")({
     const stockSymbol = tx?.details.split(" ")[2];
 
     const chart = (
-      await client.api.yahoo.chart({ symbol: `${stockSymbol}.AX` }).get()
+      await client.api.yahoo
+        .chart({ symbol: `${stockSymbol}.AX` })({ interval: "1d" })
+        .get({})
     ).data?.value?.chart.result[0];
 
     return {
@@ -165,7 +166,24 @@ function TransactionPage() {
           @ {toAUD(parseFloat(pricePerUnit ?? "0"))} ={" "}
           {toAUD(transaction?.balance ?? 0)}
         </Card>
-        <div>&nbsp;</div>
+        <Card>
+          <strong>Sell:</strong>
+          <br />
+          <a
+            target="_blank"
+            href={`https://www2.commsec.com.au/Private/EquityTrading/AustralianShares/PlaceOrder.aspx?actionType=sell&stockCode=${stockSymbol}`}
+            style={{
+              borderRadius: 9999,
+              color: "#fff",
+              backgroundColor: "hsl(0, 100%, 40%)",
+              textDecoration: "none",
+              fontWeight: "bolder",
+              padding: "8px",
+            }}
+          >
+            Sell {stockSymbol}
+          </a>
+        </Card>
       </div>
 
       <div

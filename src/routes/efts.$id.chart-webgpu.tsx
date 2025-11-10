@@ -6,7 +6,7 @@ export const Route = createFileRoute("/efts/$id/chart-webgpu")({
   component: ChartWebGPUPage,
   loader: async ({ params }) =>
     await client.api.yahoo
-      .chart({ symbol: `${params.id.toUpperCase()}.AX` })
+      .chart({ symbol: `${params.id.toUpperCase()}.AX` })({ interval: "1d" })
       .get(),
 });
 

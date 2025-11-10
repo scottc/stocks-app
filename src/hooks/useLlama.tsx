@@ -32,7 +32,9 @@ const executeTool = async (toolCall: ToolCall): Promise<string> => {
     }
     case "get_stock": {
       return JSON.stringify(
-        await client.api.yahoo.chart({ symbol: args.symbol }).get(),
+        await client.api.yahoo
+          .chart({ symbol: args.symbol })({ interval: "1d" })
+          .get(),
       );
     }
     default:

@@ -16,10 +16,13 @@ import { Route as CompareRouteImport } from './routes/compare'
 import { Route as AiRouteImport } from './routes/ai'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TransactionsIndexRouteImport } from './routes/transactions.index'
+import { Route as SectorsIndexRouteImport } from './routes/sectors.index'
 import { Route as EftsIndexRouteImport } from './routes/efts.index'
 import { Route as TransactionsIdRouteImport } from './routes/transactions.$id'
 import { Route as EftsIdRouteImport } from './routes/efts.$id'
+import { Route as SectorsIdChartRouteImport } from './routes/sectors.$id.chart'
 import { Route as EftsIdTableRouteImport } from './routes/efts.$id.table'
+import { Route as EftsIdSignalsRouteImport } from './routes/efts.$id.signals'
 import { Route as EftsIdChartWebgpuRouteImport } from './routes/efts.$id.chart-webgpu'
 import { Route as EftsIdChartRouteImport } from './routes/efts.$id.chart'
 
@@ -58,6 +61,11 @@ const TransactionsIndexRoute = TransactionsIndexRouteImport.update({
   path: '/transactions/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SectorsIndexRoute = SectorsIndexRouteImport.update({
+  id: '/sectors/',
+  path: '/sectors/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EftsIndexRoute = EftsIndexRouteImport.update({
   id: '/efts/',
   path: '/efts/',
@@ -73,9 +81,19 @@ const EftsIdRoute = EftsIdRouteImport.update({
   path: '/efts/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SectorsIdChartRoute = SectorsIdChartRouteImport.update({
+  id: '/sectors/$id/chart',
+  path: '/sectors/$id/chart',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EftsIdTableRoute = EftsIdTableRouteImport.update({
   id: '/table',
   path: '/table',
+  getParentRoute: () => EftsIdRoute,
+} as any)
+const EftsIdSignalsRoute = EftsIdSignalsRouteImport.update({
+  id: '/signals',
+  path: '/signals',
   getParentRoute: () => EftsIdRoute,
 } as any)
 const EftsIdChartWebgpuRoute = EftsIdChartWebgpuRouteImport.update({
@@ -99,10 +117,13 @@ export interface FileRoutesByFullPath {
   '/efts/$id': typeof EftsIdRouteWithChildren
   '/transactions/$id': typeof TransactionsIdRoute
   '/efts': typeof EftsIndexRoute
+  '/sectors': typeof SectorsIndexRoute
   '/transactions': typeof TransactionsIndexRoute
   '/efts/$id/chart': typeof EftsIdChartRoute
   '/efts/$id/chart-webgpu': typeof EftsIdChartWebgpuRoute
+  '/efts/$id/signals': typeof EftsIdSignalsRoute
   '/efts/$id/table': typeof EftsIdTableRoute
+  '/sectors/$id/chart': typeof SectorsIdChartRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -114,10 +135,13 @@ export interface FileRoutesByTo {
   '/efts/$id': typeof EftsIdRouteWithChildren
   '/transactions/$id': typeof TransactionsIdRoute
   '/efts': typeof EftsIndexRoute
+  '/sectors': typeof SectorsIndexRoute
   '/transactions': typeof TransactionsIndexRoute
   '/efts/$id/chart': typeof EftsIdChartRoute
   '/efts/$id/chart-webgpu': typeof EftsIdChartWebgpuRoute
+  '/efts/$id/signals': typeof EftsIdSignalsRoute
   '/efts/$id/table': typeof EftsIdTableRoute
+  '/sectors/$id/chart': typeof SectorsIdChartRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -130,10 +154,13 @@ export interface FileRoutesById {
   '/efts/$id': typeof EftsIdRouteWithChildren
   '/transactions/$id': typeof TransactionsIdRoute
   '/efts/': typeof EftsIndexRoute
+  '/sectors/': typeof SectorsIndexRoute
   '/transactions/': typeof TransactionsIndexRoute
   '/efts/$id/chart': typeof EftsIdChartRoute
   '/efts/$id/chart-webgpu': typeof EftsIdChartWebgpuRoute
+  '/efts/$id/signals': typeof EftsIdSignalsRoute
   '/efts/$id/table': typeof EftsIdTableRoute
+  '/sectors/$id/chart': typeof SectorsIdChartRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -147,10 +174,13 @@ export interface FileRouteTypes {
     | '/efts/$id'
     | '/transactions/$id'
     | '/efts'
+    | '/sectors'
     | '/transactions'
     | '/efts/$id/chart'
     | '/efts/$id/chart-webgpu'
+    | '/efts/$id/signals'
     | '/efts/$id/table'
+    | '/sectors/$id/chart'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -162,10 +192,13 @@ export interface FileRouteTypes {
     | '/efts/$id'
     | '/transactions/$id'
     | '/efts'
+    | '/sectors'
     | '/transactions'
     | '/efts/$id/chart'
     | '/efts/$id/chart-webgpu'
+    | '/efts/$id/signals'
     | '/efts/$id/table'
+    | '/sectors/$id/chart'
   id:
     | '__root__'
     | '/'
@@ -177,10 +210,13 @@ export interface FileRouteTypes {
     | '/efts/$id'
     | '/transactions/$id'
     | '/efts/'
+    | '/sectors/'
     | '/transactions/'
     | '/efts/$id/chart'
     | '/efts/$id/chart-webgpu'
+    | '/efts/$id/signals'
     | '/efts/$id/table'
+    | '/sectors/$id/chart'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -193,7 +229,9 @@ export interface RootRouteChildren {
   EftsIdRoute: typeof EftsIdRouteWithChildren
   TransactionsIdRoute: typeof TransactionsIdRoute
   EftsIndexRoute: typeof EftsIndexRoute
+  SectorsIndexRoute: typeof SectorsIndexRoute
   TransactionsIndexRoute: typeof TransactionsIndexRoute
+  SectorsIdChartRoute: typeof SectorsIdChartRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -247,6 +285,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TransactionsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/sectors/': {
+      id: '/sectors/'
+      path: '/sectors'
+      fullPath: '/sectors'
+      preLoaderRoute: typeof SectorsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/efts/': {
       id: '/efts/'
       path: '/efts'
@@ -268,11 +313,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EftsIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/sectors/$id/chart': {
+      id: '/sectors/$id/chart'
+      path: '/sectors/$id/chart'
+      fullPath: '/sectors/$id/chart'
+      preLoaderRoute: typeof SectorsIdChartRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/efts/$id/table': {
       id: '/efts/$id/table'
       path: '/table'
       fullPath: '/efts/$id/table'
       preLoaderRoute: typeof EftsIdTableRouteImport
+      parentRoute: typeof EftsIdRoute
+    }
+    '/efts/$id/signals': {
+      id: '/efts/$id/signals'
+      path: '/signals'
+      fullPath: '/efts/$id/signals'
+      preLoaderRoute: typeof EftsIdSignalsRouteImport
       parentRoute: typeof EftsIdRoute
     }
     '/efts/$id/chart-webgpu': {
@@ -295,12 +354,14 @@ declare module '@tanstack/react-router' {
 interface EftsIdRouteChildren {
   EftsIdChartRoute: typeof EftsIdChartRoute
   EftsIdChartWebgpuRoute: typeof EftsIdChartWebgpuRoute
+  EftsIdSignalsRoute: typeof EftsIdSignalsRoute
   EftsIdTableRoute: typeof EftsIdTableRoute
 }
 
 const EftsIdRouteChildren: EftsIdRouteChildren = {
   EftsIdChartRoute: EftsIdChartRoute,
   EftsIdChartWebgpuRoute: EftsIdChartWebgpuRoute,
+  EftsIdSignalsRoute: EftsIdSignalsRoute,
   EftsIdTableRoute: EftsIdTableRoute,
 }
 
@@ -317,7 +378,9 @@ const rootRouteChildren: RootRouteChildren = {
   EftsIdRoute: EftsIdRouteWithChildren,
   TransactionsIdRoute: TransactionsIdRoute,
   EftsIndexRoute: EftsIndexRoute,
+  SectorsIndexRoute: SectorsIndexRoute,
   TransactionsIndexRoute: TransactionsIndexRoute,
+  SectorsIdChartRoute: SectorsIdChartRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

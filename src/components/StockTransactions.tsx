@@ -30,60 +30,7 @@ const Transactions = ({
         init: () => <></>,
         loading: () => <></>,
         value: (v) => {
-          return (
-            <>
-              <table style={style}>
-                <thead>
-                  <tr>
-                    <th>Date</th>
-                    <th>Reference</th>
-                    <th>Details</th>
-                    <th>Debit</th>
-                    <th>Credit</th>
-                    <th>Balance</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {v.map((t) => (
-                    <tr key={t.reference}>
-                      <td>{t.date}</td>
-                      <td>
-                        <Link
-                          to="/transactions/$id"
-                          params={{ id: t.reference }}
-                        >
-                          {t.reference}
-                        </Link>
-                      </td>
-                      <td>
-                        <Details details={t.details} />
-                      </td>
-                      <td>{toAUD(t.debit)}</td>
-                      <td>{toAUD(t.credit)}</td>
-                      <td>{toAUD(t.balance)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-
-              <button
-                onClick={(_e) => alert("TODO: Implement missing feature.")}
-              >
-                Import Commsec Transactions
-              </button>
-
-              <p>
-                Commsec{" | "}
-                <a
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  href="https://www2.commsec.com.au/Portfolio/transactions"
-                >
-                  Transactions
-                </a>
-              </p>
-            </>
-          );
+          return <></>;
         },
         error: (e) => <ErrorView error={e} />,
       })}

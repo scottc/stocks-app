@@ -15,6 +15,9 @@ interface ASXListedSecurity {
   gicsIndustyGroup: string;
 }
 
+// https://asx.api.markitdigital.com/asx-research/1.0/etfs/IOO/about
+//
+
 const URL = "https://www.asx.com.au/asx/research/ASXListedSecurities.csv";
 
 const CACHE_DIR = join(process.cwd(), "data", "asx", "listedcompanies");

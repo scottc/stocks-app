@@ -18,11 +18,11 @@ export const useYahooStock = ({
 }: UseYahooStockOptions) =>
   useCachedFetch(
     // cache key
-    `client.api.yahoo.chart({ symbol: : ${symbol} })`,
+    `client.api.yahoo.chart({ symbol: : ${symbol}, interval: "${"1d"}" })`,
     // cache task
     () =>
       client.api.yahoo
-        .chart({ symbol })
+        .chart({ symbol })({ interval: "1d" })
         .get()
         .then((res) => {
           if (!res.data) throw new Error("No data");

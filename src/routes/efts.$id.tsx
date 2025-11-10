@@ -37,7 +37,7 @@ export const Route = createFileRoute("/efts/$id")({
   component: EftPage,
   loader: async ({ params }) =>
     await client.api.yahoo
-      .chart({ symbol: `${params.id.toUpperCase()}.AX` })
+      .chart({ symbol: `${params.id.toUpperCase()}.AX` })({ interval: "1d" })
       .get(),
 });
 
@@ -93,9 +93,23 @@ function EftPage() {
         View Chart
       </Link>
       {" | "}
+      <Link to="/efts/$id/signals" params={{ id }}>
+        View Signals
+      </Link>
+      {" | "}
       <Link to="/efts/$id/chart-webgpu" params={{ id }}>
         WebGPU Experiment
       </Link>
+      {" | "}
+      <a href={`https://finance.yahoo.com/chart/${id.toUpperCase()}.AX`}>
+        Yahoo Chart
+      </a>
+      {" | "}
+      <a
+        href={`https://www.tradingview.com/chart/?symbol=ASX%3A${id.toUpperCase()}`}
+      >
+        TradingView Chart
+      </a>
 
       <Outlet />
       {/*

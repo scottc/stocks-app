@@ -6,7 +6,20 @@ import { loadLatestTransactions } from "./data-loaders/commsec-transactions";
 import { loadHoldings } from "./data-loaders/commsec-holdings";
 import { fetchASXListedSecurities } from "./data-loaders/asx";
 import { cache, instance } from "./data-loaders/alpha-vantage";
-import { commsecEftScreener } from "./data-loaders/commsec/efts";
+import { fetchCommsecEftScreener } from "./data-loaders/commsec/efts";
+import { Effect } from "effect";
+import { BunContext, BunHttpPlatform, BunRuntime } from "@effect/platform-bun";
+import { fetchCommsecMarketPrices } from "./data-loaders/commsec/marketPrices";
+import {
+  FetchHttpClient,
+  HttpApiClient,
+  HttpClient,
+  HttpPlatform,
+} from "@effect/platform";
+import {
+  getCommsecLoginCookies,
+  postCommsecLogin,
+} from "./data-loaders/commsec/login";
 
 //import stream from "./ssr-react";
 
@@ -16,15 +29,52 @@ const app = new Elysia()
   .get("/api/asx/listedcompanies", fetchASXListedSecurities)
   .get("/api/commsec/holdings", loadHoldings)
   .get("/api/commsec/transactions", loadLatestTransactions)
-  .get("/api/commsec/eftscreener", () => commsecEftScreener)
+  .get("/api/commsec/login/:username/:password", (req) =>
+    Effect.runPromise(
+      // WARNING: do not call this, it's not secure... password will be exposed to browser history api...
+      postCommsecLogin(req.params.username, req.params.password).pipe(
+        Effect.provide(FetchHttpClient.layer),
+      ),
+    ),
+  )
+  .get(
+    "/api/commsec/eftscreener",
+    () =>
+      Effect.runPromise(
+        fetchCommsecEftScreener.pipe(Effect.provide(BunContext.layer)),
+      ),
+    //.catch((err) => {
+    // TODO: handle ParseError | PlatformError
+    // TODO: how can we enforce error handling is called prior to returning to elysia?
+    // TODO: map errors, to the appropriate http reponses...
+    //})
+  )
+  .get(
+    "/api/commsec/marketprices/:securityCode",
+    (req) =>
+      Effect.runPromise(
+        fetchCommsecMarketPrices(req.params.securityCode).pipe(
+          Effect.provide(FetchHttpClient.layer),
+        ), //
+      ),
+    //.catch((err) => {
+    // TODO: handle ParseError | PlatformError
+    // TODO: how can we enforce error handling is called prior to returning to elysia?
+    // TODO: map errors, to the appropriate http reponses...
+    //})
+  )
   .get("/api/alphavantage/LISTING_STATUS", () => cache)
   .get(
     "/api/alphavantage/NEWS_SENTIMENT/:tickers",
     async (req) => await instance.NEWS_SENTIMENT(req.params.tickers),
   )
   .get(
-    "/api/yahoo/chart/:symbol",
-    async (req) => await yahooApiFetch(req.params.symbol),
+    "/api/yahoo/chart/:symbol/:interval",
+    async (req) =>
+      await yahooApiFetch(
+        req.params.symbol,
+        req.params.interval as "1d" | "1m", // TODO: validate enum
+      ),
   )
   //.get("/ssr", async (req) => new Response(stream, { headers: {'Content-Type': 'text/html'}, }))
   .listen(3000, () => {

@@ -15,6 +15,8 @@
     "watch-routes": "tsr watch"
   },
   "dependencies": {
+    "@effect/platform": "^0.93.0",
+    "@effect/platform-bun": "^0.83.0",
     "@elysiajs/eden": "^1.4.4",
     "@statelyai/inspect": "^0.4.0",
     "@tanstack/react-devtools": "^0.8.0",
@@ -23,6 +25,7 @@
     "@tanstack/react-table": "^8.21.3",
     "@xstate/react": "^6.0.0",
     "echarts": "^6.0.0",
+    "effect": "^3.19.2",
     "elysia": "^1.4.13",
     "ollama": "^0.6.2",
     "react": "^19",

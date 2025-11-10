@@ -29,7 +29,7 @@ export async function askLlama(prompt: string): Promise<string> {
 //import { yahooApiFetch } from "./yahoo-fetch"; // Your Yahoo loader
 
 export async function analyzePortfolio(symbol: string) {
-  const result = await yahooApiFetch(symbol); // Last 20 days
+  const result = await yahooApiFetch(symbol, "1d"); // Last 20 days
 
   if (result.type === "error") {
     throw new Error("Unhandled");

@@ -32,7 +32,7 @@ export const Route = createFileRoute("/efts/$id/table")({
   component: EftPage,
   loader: async ({ params }) =>
     await client.api.yahoo
-      .chart({ symbol: `${params.id.toUpperCase()}.AX` })
+      .chart({ symbol: `${params.id.toUpperCase()}.AX` })({ interval: "1d" })
       .get(),
 });
 

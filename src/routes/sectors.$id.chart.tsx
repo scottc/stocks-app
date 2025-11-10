@@ -4,16 +4,16 @@ import type { YahooStockData } from "@/data-loaders/yahoo-finance-charts";
 import type { EChartsOption } from "@/components/echarts-for-react";
 import EChartsReact from "@/components/echarts-for-react";
 
-export const Route = createFileRoute("/efts/$id/chart")({
+export const Route = createFileRoute("/sectors/$id/chart")({
   component: EftPage,
   loader: async ({ params }) =>
     await client.api.yahoo
-      .chart({ symbol: `${params.id.toUpperCase()}.AX` })({ interval: "1d" })
+      .chart({ symbol: `^A${params.id.toUpperCase()}` })({ interval: "1d" })
       .get(),
 });
 
 function EftPage() {
-  const d = useLoaderData({ from: "/efts/$id/chart" });
+  const d = useLoaderData({ from: "/sectors/$id/chart" });
   const val = d.data?.value;
 
   if (val === undefined) {
