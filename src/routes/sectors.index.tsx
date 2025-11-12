@@ -75,17 +75,83 @@ function EftsPage() {
 
         <h2>GICS Sectors</h2>
 
-        <div>S&amp;P/ASX Energy [XEJ]</div>
-        <div>S&amp;P/ASX Materials [XMJ]</div>
-        <div>S&amp;P/ASX Industrials [XNJ]</div>
-        <div>S&amp;P/ASX Consumer Discretionary [XDJ]</div>
-        <div>S&amp;P/ASX Consumer Staples [XSJ]</div>
-        <div>S&amp;P/ASX Health Care [XHJ]</div>
-        <div>S&amp;P/ASX Financials [XFJ]</div>
-        <div>S&amp;P/ASX Information Technology [XIJ]</div>
-        <div>S&amp;P/ASX Communication Services [XTJ]</div>
-        <div>S&amp;P/ASX Utilities [XUJ]</div>
-        <div>S&amp;P/ASX Real Estate [XRE]</div>
+        <div>
+          S&amp;P/ASX Energy [
+          <Link to="/sectors/$id/chart" params={{ id: "xej" }}>
+            XEJ
+          </Link>
+          ]
+        </div>
+        <div>
+          S&amp;P/ASX Materials [
+          <Link to="/sectors/$id/chart" params={{ id: "xmj" }}>
+            XMJ
+          </Link>
+          ]
+        </div>
+        <div>
+          S&amp;P/ASX Industrials [
+          <Link to="/sectors/$id/chart" params={{ id: "xnj" }}>
+            XNJ
+          </Link>
+          ]
+        </div>
+        <div>
+          S&amp;P/ASX Consumer Discretionary [
+          <Link to="/sectors/$id/chart" params={{ id: "xdj" }}>
+            XDJ
+          </Link>
+          ]
+        </div>
+        <div>
+          S&amp;P/ASX Consumer Staples [
+          <Link to="/sectors/$id/chart" params={{ id: "xsj" }}>
+            XSJ
+          </Link>
+          ]
+        </div>
+        <div>
+          S&amp;P/ASX Health Care [
+          <Link to="/sectors/$id/chart" params={{ id: "xhj" }}>
+            XHJ
+          </Link>
+          ]
+        </div>
+        <div>
+          S&amp;P/ASX Financials [
+          <Link to="/sectors/$id/chart" params={{ id: "xfj" }}>
+            XFJ
+          </Link>
+          ]
+        </div>
+        <div>
+          S&amp;P/ASX Information Technology [
+          <Link to="/sectors/$id/chart" params={{ id: "xij" }}>
+            XIJ
+          </Link>
+          ]
+        </div>
+        <div>
+          S&amp;P/ASX Communication Services [
+          <Link to="/sectors/$id/chart" params={{ id: "xtj" }}>
+            XTJ
+          </Link>
+          ]
+        </div>
+        <div>
+          S&amp;P/ASX Utilities [
+          <Link to="/sectors/$id/chart" params={{ id: "xuj" }}>
+            XUJ
+          </Link>
+          ]
+        </div>
+        <div>
+          S&amp;P/ASX Real Estate [
+          <Link to="/sectors/$id/chart" params={{ id: "xre" }}>
+            XRE
+          </Link>
+          ]
+        </div>
       </div>
     </>
   );

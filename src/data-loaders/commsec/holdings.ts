@@ -1,46 +1,99 @@
 import { error, value, type Result } from "@/store/lib";
+import {
+  FileSystem,
+  Path,
+  HttpClient,
+  FetchHttpClient,
+} from "@effect/platform";
+import { Effect, Schema, DateTime } from "effect";
 import { readdir, readFile } from "fs/promises";
 import { join } from "path";
 
-// === Types ===
-interface HoldingEntry {
-  code: string;
-  availUnits: number;
-  purchasePrice: number;
-  lastPrice: number;
-  changePrice: number;
-  changePercent: number;
-  profitLoss: number;
-  profitLossPercent: number;
-  marketValue: number;
-  weightPercent: number;
-  valueChange: number;
-}
+const commsecHoldingEntrySchema = Schema.Struct({
+  code: Schema.String,
+  availUnits: Schema.Number,
+  purchasePrice: Schema.Number,
+  lastPrice: Schema.Number,
+  changePrice: Schema.Number,
+  changePercent: Schema.Number,
+  profitLoss: Schema.Number,
+  profitLossPercent: Schema.Number,
+  marketValue: Schema.Number,
+  weightPercent: Schema.Number,
+  valueChange: Schema.Number,
+});
 
-interface HoldingSummary {
-  profitLoss: number;
-  profitLossPercent: number;
-  marketValue: number;
-  weightPercent: number;
-  valueChange: number;
-}
+const commsecSummarySchema = Schema.Struct({
+  profitLoss: Schema.Number,
+  profitLossPercent: Schema.Number,
+  marketValue: Schema.Number,
+  weightPercent: Schema.Number,
+  valueChange: Schema.Number,
+});
 
-export interface CommsecHoldings {
-  accountNumber: string;
-  asOfDateTime: string;
-  holdings: HoldingEntry[];
-  summary: HoldingSummary;
-}
+const comsecHoldingsSchema = Schema.Struct({
+  accountNumber: Schema.String,
+  asOfDateTime: Schema.String,
+  holdings: Schema.Array(commsecHoldingEntrySchema),
+  summary: commsecSummarySchema,
+});
 
-// === In-memory cache (timestamp-based) ===
-interface CacheEntry {
-  result: Result<CommsecHoldings>;
-  cachedAt: number; // Date.now() when the data was parsed
-}
+type CommsecHoldings = Schema.Schema.Type<typeof comsecHoldingsSchema>;
+type HoldingEntry = Schema.Schema.Type<typeof commsecHoldingEntrySchema>;
+type HoldingSummary = Schema.Schema.Type<typeof commsecSummarySchema>;
 
-let cache: CacheEntry | null = null;
+const fetchAllAccountsAllHoldings = Effect.gen(function* () {
+  const fs = yield* FileSystem.FileSystem;
+  const path = yield* Path.Path;
 
-// === Helpers ===
+  const cwd = path.resolve(".");
+  const dir = path.join(cwd, "data", "commsec", "holdings");
+
+  const accountsHoldingsFilePaths = yield* fs.readDirectory(dir, {
+    recursive: true,
+  });
+
+  const files = accountsHoldingsFilePaths.map((f) => path.join(dir, f));
+
+  const parsed = files.map(parse);
+
+  // TODO: parse using schema.
+  // TODO: cache in memory.
+
+  return parsed;
+});
+
+const fetchAccountHoldings = (accountId: string) =>
+  Effect.gen(function* () {
+    const fs = yield* FileSystem.FileSystem;
+    const path = yield* Path.Path;
+
+    const cwd = path.resolve(".");
+    const dir = path.join(cwd, "data", "commsec", "holdings", accountId);
+
+    console.log(dir);
+
+    const holdings = yield* fs.readDirectory(dir);
+
+    console.log(holdings);
+
+    const contents = yield* fs.readFileString(
+      path.join(dir, holdings[0] ?? ""),
+    );
+
+    console.log(contents);
+
+    const parsed = parse(contents);
+
+    console.log(parsed);
+
+    // TODO: handle not found.
+    // TODO: parse using schema.
+    // TODO: cache in memory.
+
+    return parsed;
+  });
+
 const toNumber = (val: string): number => {
   if (!val) return 0;
   const cleaned = val.replace(/[$,%]/g, "").trim();
@@ -75,47 +128,7 @@ const parseCSVLine = (line: string): string[] => {
   return result;
 };
 
-// === Find newest file ===
-async function findNewestHoldingsFile(): Promise<Result<string>> {
-  const dir = join(process.cwd(), "data", "commsec", "holdings");
-  const files = await readdir(dir);
-
-  const csvFiles = files
-    .filter((f) => /^Holdings_\d+_\d{2}-\d{2}-\d{4}\.csv$/.test(f))
-    .map((f) => {
-      const match = f.match(/_(\d{2})-(\d{2})-(\d{4})\.csv$/);
-      if (!match) return null;
-      const [dd, mm, yyyy] = match.slice(1);
-      const date = new Date(`${yyyy}-${mm}-${dd}`);
-      return { name: f, time: date.getTime() };
-    })
-    .filter((f): f is { name: string; time: number } => f !== null)
-    .sort((a, b) => b.time - a.time);
-
-  if (csvFiles.length === 0) {
-    return error(
-      new Error("No Holdings_*.csv file found in ./data/commsec/holdings/"),
-    );
-  }
-
-  return value(join(dir, csvFiles[0]?.name ?? ""));
-}
-
-export async function loadHoldings(): Promise<Result<CommsecHoldings>> {
-  // If we already have a cache for *exactly this file*, return it
-  if (cache) {
-    // TODO: implement expiry.
-    console.log("[Memory] Retrived commsec holdings.");
-    return cache.result;
-  }
-
-  const filePath = await findNewestHoldingsFile();
-
-  if (filePath.type === "error") {
-    return filePath;
-  }
-
-  const content = await readFile(filePath.value, "utf-8");
+const parse = (content: string): Result<CommsecHoldings> => {
   const lines = content
     .split(/\r?\n/)
     .map((l) => l.trim())
@@ -198,16 +211,20 @@ export async function loadHoldings(): Promise<Result<CommsecHoldings>> {
   } else if (!summary) {
     result = error(new Error("Summary (Total) line not found"));
   } else {
-    result = value({ accountNumber, asOfDateTime, holdings, summary });
+    result = value({
+      accountNumber,
+      asOfDateTime: asOfDateTime ?? "",
+      holdings,
+      summary,
+    });
   }
 
-  cache = {
-    cachedAt: Date.now(),
-    result: result,
-  };
-
-  console.log("[Disk] Retrived commsec holdings from disk.");
-  console.log("[Memory] Cached commsec holdings.");
-
   return result;
-}
+};
+
+export {
+  fetchAllAccountsAllHoldings,
+  fetchAccountHoldings,
+  type CommsecHoldings,
+  type HoldingEntry,
+};

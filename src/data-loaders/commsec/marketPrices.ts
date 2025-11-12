@@ -6,62 +6,6 @@ import {
 } from "@effect/platform";
 import { Effect, Schema, DateTime } from "effect";
 
-/*
-{
-    "status": 0,
-    "marketDepthPrices": {
-        "prices": [
-            {
-                "buyNumber": 1,
-                "buyVolume": 31,
-                "buyPrice": 93.1,
-                "sellNumber": 1,
-                "sellVolume": 14,
-                "sellPrice": 93.16
-            },
-            {
-                "buyNumber": 1,
-                "buyVolume": 6,
-                "buyPrice": 93.03,
-                "sellNumber": 1,
-                "sellVolume": 75,
-                "sellPrice": 93.5
-            },
-            {
-                "buyNumber": 1,
-                "buyVolume": 10,
-                "buyPrice": 92.95,
-                "sellNumber": 1,
-                "sellVolume": 468,
-                "sellPrice": 93.97
-            },
-            {
-                "buyNumber": 1,
-                "buyVolume": 346,
-                "buyPrice": 92.85,
-                "sellNumber": 2,
-                "sellVolume": 2084,
-                "sellPrice": 94.0
-            },
-            {
-                "buyNumber": 1,
-                "buyVolume": 2,
-                "buyPrice": 92.79,
-                "sellNumber": 1,
-                "sellVolume": 7,
-                "sellPrice": 94.1
-            }
-        ],
-        "totalBuyOrders": 5,
-        "totalBuyVolume": 395,
-        "totalSellOrders": 6,
-        "totalSellVolume": 2648,
-        "currentDateTime": "2025-11-10T16:16:47.2581121+11:00"
-    },
-    "currentDateTime": "2025-11-10T16:16:47.2581121+11:00"
-}
-*/
-
 const pricesSchema = Schema.Struct({
   status: Schema.Number, // 0 = Success ... TODO: this looks like an a bool or enum
   marketDepthPrices: Schema.Struct({
@@ -109,11 +53,9 @@ const fetchCommsecMarketPrices = (securityCode: string) =>
 
     const content = yield* response.text;
 
-    const decode = Schema.decode(Schema.parseJson(pricesSchema));
+    const decodeFunc = Schema.decode(Schema.parseJson(pricesSchema));
 
-    console.log(content);
-
-    const decoded = yield* decode(content, { exact: true });
+    const decoded = yield* decodeFunc(content, { exact: true });
 
     return decoded;
   });

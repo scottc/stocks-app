@@ -2,9 +2,10 @@ import client from "@/client";
 import { createFileRoute, Link, useLoaderData } from "@tanstack/react-router";
 import type { CSSProperties } from "react";
 
-export const Route = createFileRoute("/holdings")({
+export const Route = createFileRoute("/accounts/$id/holdings")({
   component: HoldingsPage,
-  loader: async () => await client.api.commsec.holdings.get(),
+  loader: async ({ params }) =>
+    await client.api.commsec.accounts({ id: params.id }).holdings.get(),
 });
 
 const style: CSSProperties = {
@@ -13,7 +14,7 @@ const style: CSSProperties = {
 };
 
 function HoldingsPage() {
-  const v = useLoaderData({ from: "/holdings" }).data?.value;
+  const v = useLoaderData({ from: "/accounts/$id/holdings" }).data?.value;
 
   if (v === undefined) return <></>;
 

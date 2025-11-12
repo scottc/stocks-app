@@ -10,30 +10,27 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SearchRouteImport } from './routes/search'
-import { Route as HoldingsRouteImport } from './routes/holdings'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as CompareRouteImport } from './routes/compare'
 import { Route as AiRouteImport } from './routes/ai'
+import { Route as AccountsRouteImport } from './routes/accounts'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as TransactionsIndexRouteImport } from './routes/transactions.index'
 import { Route as SectorsIndexRouteImport } from './routes/sectors.index'
 import { Route as EftsIndexRouteImport } from './routes/efts.index'
-import { Route as TransactionsIdRouteImport } from './routes/transactions.$id'
 import { Route as EftsIdRouteImport } from './routes/efts.$id'
+import { Route as AccountsIdRouteImport } from './rou./routes/accounts.$id
 import { Route as SectorsIdChartRouteImport } from './routes/sectors.$id.chart'
 import { Route as EftsIdTableRouteImport } from './routes/efts.$id.table'
 import { Route as EftsIdSignalsRouteImport } from './routes/efts.$id.signals'
 import { Route as EftsIdChartWebgpuRouteImport } from './routes/efts.$id.chart-webgpu'
 import { Route as EftsIdChartRouteImport } from './routes/efts.$id.chart'
+import { Route as AccountsIdTransactionsRouteImport } from './routes/accounts.$id.transactions'
+import { Route as AccountsIdHoldingsRouteImport } from './routes/accounts.$id.holdings'
+import { Route as AccountsIdTransactionsTxidRouteImport } from './routes/accounts.$id.transactions.$txid'
 
 const SearchRoute = SearchRouteImport.update({
   id: '/search',
   path: '/search',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const HoldingsRoute = HoldingsRouteImport.update({
-  id: '/holdings',
-  path: '/holdings',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
@@ -51,14 +48,14 @@ const AiRoute = AiRouteImport.update({
   path: '/ai',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AccountsRoute = AccountsRouteImport.update({
+  id: '/accounts',
+  path: '/accounts',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TransactionsIndexRoute = TransactionsIndexRouteImport.update({
-  id: '/transactions/',
-  path: '/transactions/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SectorsIndexRoute = SectorsIndexRouteImport.update({
@@ -71,15 +68,15 @@ const EftsIndexRoute = EftsIndexRouteImport.update({
   path: '/efts/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const TransactionsIdRoute = TransactionsIdRouteImport.update({
-  id: '/transactions/$id',
-  path: '/transactions/$id',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const EftsIdRoute = EftsIdRouteImport.update({
   id: '/efts/$id',
   path: '/efts/$id',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AccountsIdRoute = AccountsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AccountsRoute,
 } as any)
 const SectorsIdChartRoute = SectorsIdChartRouteImport.update({
   id: '/sectors/$id/chart',
@@ -106,131 +103,157 @@ const EftsIdChartRoute = EftsIdChartRouteImport.update({
   path: '/chart',
   getParentRoute: () => EftsIdRoute,
 } as any)
+const AccountsIdTransactionsRoute = AccountsIdTransactionsRouteImport.update({
+  id: '/transactions',
+  path: '/transactions',
+  getParentRoute: () => AccountsIdRoute,
+} as any)
+const AccountsIdHoldingsRoute = AccountsIdHoldingsRouteImport.update({
+  id: '/holdings',
+  path: '/holdings',
+  getParentRoute: () => AccountsIdRoute,
+} as any)
+const AccountsIdTransactionsTxidRoute =
+  AccountsIdTransactionsTxidRouteImport.update({
+    id: '/$txid',
+    path: '/$txid',
+    getParentRoute: () => AccountsIdTransactionsRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/accounts': typeof AccountsRouteWithChildren
   '/ai': typeof AiRoute
   '/compare': typeof CompareRoute
   '/dashboard': typeof DashboardRoute
-  '/holdings': typeof HoldingsRoute
   '/search': typeof SearchRoute
+  '/accounts/$id': typeof AccountsIdRouteWithChildren
   '/efts/$id': typeof EftsIdRouteWithChildren
-  '/transactions/$id': typeof TransactionsIdRoute
   '/efts': typeof EftsIndexRoute
   '/sectors': typeof SectorsIndexRoute
-  '/transactions': typeof TransactionsIndexRoute
+  '/accounts/$id/holdings': typeof AccountsIdHoldingsRoute
+  '/accounts/$id/transactions': typeof AccountsIdTransactionsRouteWithChildren
   '/efts/$id/chart': typeof EftsIdChartRoute
   '/efts/$id/chart-webgpu': typeof EftsIdChartWebgpuRoute
   '/efts/$id/signals': typeof EftsIdSignalsRoute
   '/efts/$id/table': typeof EftsIdTableRoute
   '/sectors/$id/chart': typeof SectorsIdChartRoute
+  '/accounts/$id/transactions/$txid': typeof AccountsIdTransactionsTxidRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/accounts': typeof AccountsRouteWithChildren
   '/ai': typeof AiRoute
   '/compare': typeof CompareRoute
   '/dashboard': typeof DashboardRoute
-  '/holdings': typeof HoldingsRoute
   '/search': typeof SearchRoute
+  '/accounts/$id': typeof AccountsIdRouteWithChildren
   '/efts/$id': typeof EftsIdRouteWithChildren
-  '/transactions/$id': typeof TransactionsIdRoute
   '/efts': typeof EftsIndexRoute
   '/sectors': typeof SectorsIndexRoute
-  '/transactions': typeof TransactionsIndexRoute
+  '/accounts/$id/holdings': typeof AccountsIdHoldingsRoute
+  '/accounts/$id/transactions': typeof AccountsIdTransactionsRouteWithChildren
   '/efts/$id/chart': typeof EftsIdChartRoute
   '/efts/$id/chart-webgpu': typeof EftsIdChartWebgpuRoute
   '/efts/$id/signals': typeof EftsIdSignalsRoute
   '/efts/$id/table': typeof EftsIdTableRoute
   '/sectors/$id/chart': typeof SectorsIdChartRoute
+  '/accounts/$id/transactions/$txid': typeof AccountsIdTransactionsTxidRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/accounts': typeof AccountsRouteWithChildren
   '/ai': typeof AiRoute
   '/compare': typeof CompareRoute
   '/dashboard': typeof DashboardRoute
-  '/holdings': typeof HoldingsRoute
   '/search': typeof SearchRoute
+  '/accounts/$id': typeof AccountsIdRouteWithChildren
   '/efts/$id': typeof EftsIdRouteWithChildren
-  '/transactions/$id': typeof TransactionsIdRoute
   '/efts/': typeof EftsIndexRoute
   '/sectors/': typeof SectorsIndexRoute
-  '/transactions/': typeof TransactionsIndexRoute
+  '/accounts/$id/holdings': typeof AccountsIdHoldingsRoute
+  '/accounts/$id/transactions': typeof AccountsIdTransactionsRouteWithChildren
   '/efts/$id/chart': typeof EftsIdChartRoute
   '/efts/$id/chart-webgpu': typeof EftsIdChartWebgpuRoute
   '/efts/$id/signals': typeof EftsIdSignalsRoute
   '/efts/$id/table': typeof EftsIdTableRoute
   '/sectors/$id/chart': typeof SectorsIdChartRoute
+  '/accounts/$id/transactions/$txid': typeof AccountsIdTransactionsTxidRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/accounts'
     | '/ai'
     | '/compare'
     | '/dashboard'
-    | '/holdings'
     | '/search'
+    | '/accounts/$id'
     | '/efts/$id'
-    | '/transactions/$id'
     | '/efts'
     | '/sectors'
-    | '/transactions'
+    | '/accounts/$id/holdings'
+    | '/accounts/$id/transactions'
     | '/efts/$id/chart'
     | '/efts/$id/chart-webgpu'
     | '/efts/$id/signals'
     | '/efts/$id/table'
     | '/sectors/$id/chart'
+    | '/accounts/$id/transactions/$txid'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/accounts'
     | '/ai'
     | '/compare'
     | '/dashboard'
-    | '/holdings'
     | '/search'
+    | '/accounts/$id'
     | '/efts/$id'
-    | '/transactions/$id'
     | '/efts'
     | '/sectors'
-    | '/transactions'
+    | '/accounts/$id/holdings'
+    | '/accounts/$id/transactions'
     | '/efts/$id/chart'
     | '/efts/$id/chart-webgpu'
     | '/efts/$id/signals'
     | '/efts/$id/table'
     | '/sectors/$id/chart'
+    | '/accounts/$id/transactions/$txid'
   id:
     | '__root__'
     | '/'
+    | '/accounts'
     | '/ai'
     | '/compare'
     | '/dashboard'
-    | '/holdings'
     | '/search'
+    | '/accounts/$id'
     | '/efts/$id'
-    | '/transactions/$id'
     | '/efts/'
     | '/sectors/'
-    | '/transactions/'
+    | '/accounts/$id/holdings'
+    | '/accounts/$id/transactions'
     | '/efts/$id/chart'
     | '/efts/$id/chart-webgpu'
     | '/efts/$id/signals'
     | '/efts/$id/table'
     | '/sectors/$id/chart'
+    | '/accounts/$id/transactions/$txid'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AccountsRoute: typeof AccountsRouteWithChildren
   AiRoute: typeof AiRoute
   CompareRoute: typeof CompareRoute
   DashboardRoute: typeof DashboardRoute
-  HoldingsRoute: typeof HoldingsRoute
   SearchRoute: typeof SearchRoute
   EftsIdRoute: typeof EftsIdRouteWithChildren
-  TransactionsIdRoute: typeof TransactionsIdRoute
   EftsIndexRoute: typeof EftsIndexRoute
   SectorsIndexRoute: typeof SectorsIndexRoute
-  TransactionsIndexRoute: typeof TransactionsIndexRoute
   SectorsIdChartRoute: typeof SectorsIdChartRoute
 }
 
@@ -241,13 +264,6 @@ declare module '@tanstack/react-router' {
       path: '/search'
       fullPath: '/search'
       preLoaderRoute: typeof SearchRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/holdings': {
-      id: '/holdings'
-      path: '/holdings'
-      fullPath: '/holdings'
-      preLoaderRoute: typeof HoldingsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard': {
@@ -271,18 +287,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AiRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/accounts': {
+      id: '/accounts'
+      path: '/accounts'
+      fullPath: '/accounts'
+      preLoaderRoute: typeof AccountsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/transactions/': {
-      id: '/transactions/'
-      path: '/transactions'
-      fullPath: '/transactions'
-      preLoaderRoute: typeof TransactionsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sectors/': {
@@ -299,19 +315,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EftsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/transactions/$id': {
-      id: '/transactions/$id'
-      path: '/transactions/$id'
-      fullPath: '/transactions/$id'
-      preLoaderRoute: typeof TransactionsIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/efts/$id': {
       id: '/efts/$id'
       path: '/efts/$id'
       fullPath: '/efts/$id'
       preLoaderRoute: typeof EftsIdRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/accounts/$id': {
+      id: '/accounts/$id'
+      path: '/$id'
+      fullPath: '/accounts/$id'
+      preLoaderRoute: typeof AccountsIdRouteImport
+      parentRoute: typeof AccountsRoute
     }
     '/sectors/$id/chart': {
       id: '/sectors/$id/chart'
@@ -348,8 +364,69 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EftsIdChartRouteImport
       parentRoute: typeof EftsIdRoute
     }
+    '/accounts/$id/transactions': {
+      id: '/accounts/$id/transactions'
+      path: '/transactions'
+      fullPath: '/accounts/$id/transactions'
+      preLoaderRoute: typeof AccountsIdTransactionsRouteImport
+      parentRoute: typeof AccountsIdRoute
+    }
+    '/accounts/$id/holdings': {
+      id: '/accounts/$id/holdings'
+      path: '/holdings'
+      fullPath: '/accounts/$id/holdings'
+      preLoaderRoute: typeof AccountsIdHoldingsRouteImport
+      parentRoute: typeof AccountsIdRoute
+    }
+    '/accounts/$id/transactions/$txid': {
+      id: '/accounts/$id/transactions/$txid'
+      path: '/$txid'
+      fullPath: '/accounts/$id/transactions/$txid'
+      preLoaderRoute: typeof AccountsIdTransactionsTxidRouteImport
+      parentRoute: typeof AccountsIdTransactionsRoute
+    }
   }
 }
+
+interface AccountsIdTransactionsRouteChildren {
+  AccountsIdTransactionsTxidRoute: typeof AccountsIdTransactionsTxidRoute
+}
+
+const AccountsIdTransactionsRouteChildren: AccountsIdTransactionsRouteChildren =
+  {
+    AccountsIdTransactionsTxidRoute: AccountsIdTransactionsTxidRoute,
+  }
+
+const AccountsIdTransactionsRouteWithChildren =
+  AccountsIdTransactionsRoute._addFileChildren(
+    AccountsIdTransactionsRouteChildren,
+  )
+
+interface AccountsIdRouteChildren {
+  AccountsIdHoldingsRoute: typeof AccountsIdHoldingsRoute
+  AccountsIdTransactionsRoute: typeof AccountsIdTransactionsRouteWithChildren
+}
+
+const AccountsIdRouteChildren: AccountsIdRouteChildren = {
+  AccountsIdHoldingsRoute: AccountsIdHoldingsRoute,
+  AccountsIdTransactionsRoute: AccountsIdTransactionsRouteWithChildren,
+}
+
+const AccountsIdRouteWithChildren = AccountsIdRoute._addFileChildren(
+  AccountsIdRouteChildren,
+)
+
+interface AccountsRouteChildren {
+  AccountsIdRoute: typeof AccountsIdRouteWithChildren
+}
+
+const AccountsRouteChildren: AccountsRouteChildren = {
+  AccountsIdRoute: AccountsIdRouteWithChildren,
+}
+
+const AccountsRouteWithChildren = AccountsRoute._addFileChildren(
+  AccountsRouteChildren,
+)
 
 interface EftsIdRouteChildren {
   EftsIdChartRoute: typeof EftsIdChartRoute
@@ -370,16 +447,14 @@ const EftsIdRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AccountsRoute: AccountsRouteWithChildren,
   AiRoute: AiRoute,
   CompareRoute: CompareRoute,
   DashboardRoute: DashboardRoute,
-  HoldingsRoute: HoldingsRoute,
   SearchRoute: SearchRoute,
   EftsIdRoute: EftsIdRouteWithChildren,
-  TransactionsIdRoute: TransactionsIdRoute,
   EftsIndexRoute: EftsIndexRoute,
   SectorsIndexRoute: SectorsIndexRoute,
-  TransactionsIndexRoute: TransactionsIndexRoute,
   SectorsIdChartRoute: SectorsIdChartRoute,
 }
 export const routeTree = rootRouteImport

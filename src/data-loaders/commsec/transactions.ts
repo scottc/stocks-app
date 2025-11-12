@@ -2,17 +2,30 @@ import { file } from "bun";
 import { readdir } from "fs/promises";
 import { join } from "path";
 import { value, error, type Result } from "@/store/lib";
+import {
+  FileSystem,
+  Path,
+  HttpClient,
+  FetchHttpClient,
+} from "@effect/platform";
+import { Effect, Schema, DateTime } from "effect";
 
 const TRANSACTIONS_DIR = join(process.cwd(), "data", "commsec", "transactions");
 
-export interface CommsecTransaction {
-  date: string;
-  reference: string;
-  details: string;
-  debit: number;
-  credit: number;
-  balance: number;
-}
+const commsecTransactionSchema = Schema.Struct({
+  date: Schema.String,
+  reference: Schema.String,
+  details: Schema.String,
+  debit: Schema.Number,
+  credit: Schema.Number,
+  balance: Schema.Number,
+});
+
+const commsecTransactionsSchema = Schema.Array(commsecTransactionSchema);
+
+export type CommsecTransaction = Schema.Schema.Type<
+  typeof commsecTransactionSchema
+>;
 
 // In-memory cache: filename → parsed data
 const csvCache = new Map<
@@ -26,7 +39,7 @@ function parseCsv(content: string): CommsecTransaction[] {
   const lines = content.trim().split("\n");
   // const headers = lines[0]?.split(",");
 
-  return lines.slice(1).map((line): CommsecTransaction => {
+  const results = lines.slice(1).map((line): CommsecTransaction => {
     const values = line.split(",");
 
     // if (values.length !== headers?.length) {
@@ -34,17 +47,22 @@ function parseCsv(content: string): CommsecTransaction[] {
     //   return null;
     // }
 
-    const x: CommsecTransaction = {
+    const x: CommsecTransaction = commsecTransactionSchema.make({
       date: values[0]?.trim() ?? "",
       reference: values[1]?.trim() ?? "",
       details: values[2]?.trim() ?? "",
       debit: parseFloat(values[3]?.trim() ?? ""),
       credit: parseFloat(values[4]?.trim() ?? ""),
       balance: parseFloat(values[5]?.trim() ?? ""),
-    };
+    });
+
+    // TODO: get validation result...
+    // const r = yield* Schema.validate(commsecTransactionSchema)(x);
 
     return x;
   });
+
+  return results;
 }
 
 // Main function

@@ -31,18 +31,18 @@ export interface YahooMeta {
   gmtoffset: unknown;
   timezone: string;
   exchangeTimezoneName: string;
-  regularMarketPrice: unknown;
-  fiftyTwoWeekHigh: unknown;
-  fiftyTwoWeekLow: unknown;
-  regularMarketDayHigh: unknown;
-  regularMarketDayLow: unknown;
-  regularMarketVolume: unknown;
+  regularMarketPrice: number;
+  fiftyTwoWeekHigh: number;
+  fiftyTwoWeekLow: number;
+  regularMarketDayHigh: number;
+  regularMarketDayLow: number;
+  regularMarketVolume: number;
   longName: string;
   shortName: string;
-  chartPreviousClose: unknown;
+  chartPreviousClose: number;
   priceHint: unknown;
   currentTradingPeriod: TradingPeriods;
-  dataGranularity: unknown;
+  dataGranularity: string; // enum: "1m", "1d" etc.
   range: unknown;
   validRanges: unknown;
 }
@@ -88,6 +88,9 @@ const memoryCache = new Map<
   { data: YahooStockData; timestamp: number }
 >();
 
+const toCacheKey = (symbol: string, interval: string) =>
+  `${symbol}:${interval}`.toUpperCase();
+
 const yahooApiFetch = async (
   yahooSymbol: string,
   interval: "1d" | "1m",
@@ -102,7 +105,7 @@ const yahooApiFetch = async (
     const now = Math.floor(Date.now() / 1000); // Current Unix timestamp (seconds)
 
     // 1. Check in-memory cache (exact symbol)
-    const memEntry = memoryCache.get(yahooSymbol);
+    const memEntry = memoryCache.get(toCacheKey(yahooSymbol, interval));
     if (memEntry && now - memEntry.timestamp <= CACHE_TTL) {
       console.log(`[Memory] Serving cached data for ${yahooSymbol}`);
       return value(memEntry.data);
@@ -135,7 +138,7 @@ const yahooApiFetch = async (
           const cachedData: YahooStockData = await cacheFile.json();
 
           // Populate in-memory cache on disk hit
-          memoryCache.set(yahooSymbol, {
+          memoryCache.set(toCacheKey(yahooSymbol, interval), {
             data: cachedData,
             timestamp: cacheTimestamp,
           });
@@ -149,8 +152,10 @@ const yahooApiFetch = async (
     // 1-minute, must be within last 30 days....
     // https://query1.finance.yahoo.com/v8/finance/chart/IOO.AX?events=capitalGain%7Cdiv%7Csplit&formatted=true&includeAdjustedClose=true&interval=1m&period1=1762316747&period2=1762426747&symbol=IOO.AX&userYfid=true&lang=en-AU&region=AU
 
-    const period1 = interval === "1d" ? 0 : now - 60 * 60 * (24 * 7);
-    const period2 = interval === "1d" ? 9999999999 : now;
+    const oneWeek = 60 * 60 * (24 * 7);
+
+    const period1 = interval === "1d" ? 0 : now - oneWeek;
+    const period2 = 9999999999; // interval === "1d" ? 9999999999 : 9999999999;
 
     // https://query1.finance.yahoo.com/v8/finance/chart/IOO.AX?events=capitalGain%7Cdiv%7Csplit&formatted=true&includeAdjustedClose=true&interval=1d&period1=1199228400&period2=1761709580&symbol=IOO.AX&userYfid=true&lang=en-US&region=US
     const yahooUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${yahooSymbol}?period1=${period1}&period2=${period2}&interval=${interval}&includePrePost=false&includeAdjustedClose=true&events=div%7Csplit`;
@@ -162,11 +167,15 @@ const yahooApiFetch = async (
       },
     });
 
+    console.log(response);
+
     if (!response.ok) {
       return error(new Error("not ok error")); // new Response(`Yahoo Finance API error: ${response.statusText}`, { status: response.status });
     }
 
     const data = await response.json();
+
+    console.log(data);
 
     // Save to cache
     const cacheFilePath = join(cacheSubDir, `${now}.json`);
@@ -174,7 +183,10 @@ const yahooApiFetch = async (
     console.log(`[Disk] Cached yahoo data to ${cacheFilePath}`);
 
     // Save to in-memory cache
-    memoryCache.set(yahooSymbol, { data, timestamp: now });
+    memoryCache.set(toCacheKey(yahooSymbol, interval), {
+      data,
+      timestamp: now,
+    });
     console.log(`[Memory] Cached yahoo data for ${yahooSymbol}`);
 
     return value(data);

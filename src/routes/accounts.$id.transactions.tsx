@@ -3,9 +3,10 @@ import { toAUD } from "@/store/lib";
 import { createFileRoute, Link, useLoaderData } from "@tanstack/react-router";
 import type { CSSProperties } from "react";
 
-export const Route = createFileRoute("/transactions/")({
+export const Route = createFileRoute("/accounts/$id/transactions")({
   component: TransactionsPage,
-  loader: async () => await client.api.commsec.transactions.get(),
+  loader: async ({ params }) =>
+    await client.api.commsec.accounts({ id: params.id }).transactions.get(),
 });
 
 const style: CSSProperties = {
@@ -14,7 +15,8 @@ const style: CSSProperties = {
 };
 
 function TransactionsPage() {
-  const v = useLoaderData({ from: "/transactions/" }).data?.value ?? [];
+  const v =
+    useLoaderData({ from: "/accounts/$id/transactions" }).data?.value ?? [];
 
   return (
     <div>
@@ -36,7 +38,10 @@ function TransactionsPage() {
             <tr key={t.reference}>
               <td>{t.date}</td>
               <td>
-                <Link to="/transactions/$id" params={{ id: t.reference }}>
+                <Link
+                  to="/accounts/$id/transactions/$txid"
+                  params={{ id: "0", txid: t.reference }}
+                >
                   {t.reference}
                 </Link>
               </td>

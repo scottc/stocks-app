@@ -9,12 +9,12 @@ import {
 } from "@tanstack/react-router";
 import { useState } from "react";
 
-export const Route = createFileRoute("/transactions/$id")({
+export const Route = createFileRoute("/accounts/$id/transactions/$txid")({
   component: TransactionPage,
   loader: async ({ params }) => {
-    const tx = (await client.api.commsec.transactions.get()).data?.value?.find(
-      (tx) => tx.reference === params.id,
-    );
+    const tx = (
+      await client.api.commsec.accounts({ id: params.id }).transactions.get()
+    ).data?.value?.find((tx) => tx.reference === params.id);
 
     const stockSymbol = tx?.details.split(" ")[2];
 
@@ -70,8 +70,10 @@ interface DynamicMaximumCloseDynamicTarget {
 }
 
 function TransactionPage() {
-  const { id } = useParams({ from: "/transactions/$id" });
-  const { chart, transaction } = useLoaderData({ from: "/transactions/$id" });
+  const { id } = useParams({ from: "/accounts/$id/transactions/$txid" });
+  const { chart, transaction } = useLoaderData({
+    from: "/accounts/$id/transactions/$txid",
+  });
 
   const txrawdate = transaction?.date ?? "01/01/1970";
   const txdate = auDatetoDate(txrawdate);

@@ -52,6 +52,8 @@ const postCommsecLogin = (username: string, password: string) =>
       resp2,
       resp1Cookies: resp1.cookies.cookies,
       resp2Cookies: resp2.cookies.cookies,
+      resp1body: yield* resp1.text,
+      resp2body: yield* resp2.text,
     };
   });
 

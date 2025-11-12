@@ -9,9 +9,7 @@ const RootLayout = () => (
     <Disclaimer />
 
     <Toolbar>
-      <Link to="/holdings">Holdings</Link>
-      {" | "}
-      <Link to="/transactions">Transactions</Link>
+      <Link to="/accounts">Accounts</Link>
       {" | "}
       <Link to="/efts">EFTs</Link>
       {" | "}
