@@ -18,10 +18,11 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as SectorsIndexRouteImport } from './routes/sectors.index'
 import { Route as EftsIndexRouteImport } from './routes/efts.index'
 import { Route as EftsIdRouteImport } from './routes/efts.$id'
-import { Route as AccountsIdRouteImport } from './rou./routes/accounts.$id
+import { Route as AccountsIdRouteImport } from './routes/accounts.$id'
 import { Route as SectorsIdChartRouteImport } from './routes/sectors.$id.chart'
 import { Route as EftsIdTableRouteImport } from './routes/efts.$id.table'
 import { Route as EftsIdSignalsRouteImport } from './routes/efts.$id.signals'
+import { Route as EftsIdScoreRouteImport } from './routes/efts.$id.score'
 import { Route as EftsIdChartWebgpuRouteImport } from './routes/efts.$id.chart-webgpu'
 import { Route as EftsIdChartRouteImport } from './routes/efts.$id.chart'
 import { Route as AccountsIdTransactionsRouteImport } from './routes/accounts.$id.transactions'
@@ -93,6 +94,11 @@ const EftsIdSignalsRoute = EftsIdSignalsRouteImport.update({
   path: '/signals',
   getParentRoute: () => EftsIdRoute,
 } as any)
+const EftsIdScoreRoute = EftsIdScoreRouteImport.update({
+  id: '/score',
+  path: '/score',
+  getParentRoute: () => EftsIdRoute,
+} as any)
 const EftsIdChartWebgpuRoute = EftsIdChartWebgpuRouteImport.update({
   id: '/chart-webgpu',
   path: '/chart-webgpu',
@@ -135,6 +141,7 @@ export interface FileRoutesByFullPath {
   '/accounts/$id/transactions': typeof AccountsIdTransactionsRouteWithChildren
   '/efts/$id/chart': typeof EftsIdChartRoute
   '/efts/$id/chart-webgpu': typeof EftsIdChartWebgpuRoute
+  '/efts/$id/score': typeof EftsIdScoreRoute
   '/efts/$id/signals': typeof EftsIdSignalsRoute
   '/efts/$id/table': typeof EftsIdTableRoute
   '/sectors/$id/chart': typeof SectorsIdChartRoute
@@ -155,6 +162,7 @@ export interface FileRoutesByTo {
   '/accounts/$id/transactions': typeof AccountsIdTransactionsRouteWithChildren
   '/efts/$id/chart': typeof EftsIdChartRoute
   '/efts/$id/chart-webgpu': typeof EftsIdChartWebgpuRoute
+  '/efts/$id/score': typeof EftsIdScoreRoute
   '/efts/$id/signals': typeof EftsIdSignalsRoute
   '/efts/$id/table': typeof EftsIdTableRoute
   '/sectors/$id/chart': typeof SectorsIdChartRoute
@@ -176,6 +184,7 @@ export interface FileRoutesById {
   '/accounts/$id/transactions': typeof AccountsIdTransactionsRouteWithChildren
   '/efts/$id/chart': typeof EftsIdChartRoute
   '/efts/$id/chart-webgpu': typeof EftsIdChartWebgpuRoute
+  '/efts/$id/score': typeof EftsIdScoreRoute
   '/efts/$id/signals': typeof EftsIdSignalsRoute
   '/efts/$id/table': typeof EftsIdTableRoute
   '/sectors/$id/chart': typeof SectorsIdChartRoute
@@ -198,6 +207,7 @@ export interface FileRouteTypes {
     | '/accounts/$id/transactions'
     | '/efts/$id/chart'
     | '/efts/$id/chart-webgpu'
+    | '/efts/$id/score'
     | '/efts/$id/signals'
     | '/efts/$id/table'
     | '/sectors/$id/chart'
@@ -218,6 +228,7 @@ export interface FileRouteTypes {
     | '/accounts/$id/transactions'
     | '/efts/$id/chart'
     | '/efts/$id/chart-webgpu'
+    | '/efts/$id/score'
     | '/efts/$id/signals'
     | '/efts/$id/table'
     | '/sectors/$id/chart'
@@ -238,6 +249,7 @@ export interface FileRouteTypes {
     | '/accounts/$id/transactions'
     | '/efts/$id/chart'
     | '/efts/$id/chart-webgpu'
+    | '/efts/$id/score'
     | '/efts/$id/signals'
     | '/efts/$id/table'
     | '/sectors/$id/chart'
@@ -350,6 +362,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EftsIdSignalsRouteImport
       parentRoute: typeof EftsIdRoute
     }
+    '/efts/$id/score': {
+      id: '/efts/$id/score'
+      path: '/score'
+      fullPath: '/efts/$id/score'
+      preLoaderRoute: typeof EftsIdScoreRouteImport
+      parentRoute: typeof EftsIdRoute
+    }
     '/efts/$id/chart-webgpu': {
       id: '/efts/$id/chart-webgpu'
       path: '/chart-webgpu'
@@ -431,6 +450,7 @@ const AccountsRouteWithChildren = AccountsRoute._addFileChildren(
 interface EftsIdRouteChildren {
   EftsIdChartRoute: typeof EftsIdChartRoute
   EftsIdChartWebgpuRoute: typeof EftsIdChartWebgpuRoute
+  EftsIdScoreRoute: typeof EftsIdScoreRoute
   EftsIdSignalsRoute: typeof EftsIdSignalsRoute
   EftsIdTableRoute: typeof EftsIdTableRoute
 }
@@ -438,6 +458,7 @@ interface EftsIdRouteChildren {
 const EftsIdRouteChildren: EftsIdRouteChildren = {
   EftsIdChartRoute: EftsIdChartRoute,
   EftsIdChartWebgpuRoute: EftsIdChartWebgpuRoute,
+  EftsIdScoreRoute: EftsIdScoreRoute,
   EftsIdSignalsRoute: EftsIdSignalsRoute,
   EftsIdTableRoute: EftsIdTableRoute,
 }

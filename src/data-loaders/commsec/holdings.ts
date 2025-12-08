@@ -63,6 +63,24 @@ const fetchAllAccountsAllHoldings = Effect.gen(function* () {
   return parsed;
 });
 
+const toParts = (str: string) => {
+  const fff = str.split("_").flatMap((s) => s.split("-"));
+
+  const accountId = fff[1];
+
+  const dd = parseInt(fff[2] ?? "0");
+  const mm = parseInt(fff[3] ?? "0");
+  const yyyy = parseInt(fff[4] ?? "0");
+
+  const d = new Date(yyyy, mm - 1, dd); // -1 because "monthIndex" 0-11, not 1-12
+  const ts = d.getTime();
+
+  return { accountId, dd, mm, yyyy, ts, filename: str };
+};
+
+//const desending = (a: number, b: number) => b - a;
+//const ascending = (a: number, b: number) => a - b;
+
 const fetchAccountHoldings = (accountId: string) =>
   Effect.gen(function* () {
     const fs = yield* FileSystem.FileSystem;
@@ -71,14 +89,16 @@ const fetchAccountHoldings = (accountId: string) =>
     const cwd = path.resolve(".");
     const dir = path.join(cwd, "data", "commsec", "holdings", accountId);
 
-    console.log(dir);
+    const h = yield* fs.readDirectory(dir);
 
-    const holdings = yield* fs.readDirectory(dir);
+    const holdings = h.map(toParts).sort((a, b) => b.ts - a.ts);
 
-    console.log(holdings);
+    const newest = holdings[0];
+
+    console.log("newest:", newest);
 
     const contents = yield* fs.readFileString(
-      path.join(dir, holdings[0] ?? ""),
+      path.join(dir, newest?.filename ?? ""),
     );
 
     console.log(contents);

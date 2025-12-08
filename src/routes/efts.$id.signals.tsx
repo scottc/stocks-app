@@ -7,14 +7,14 @@ import type { CSSProperties } from "react";
 import React from "react";
 
 export const Route = createFileRoute("/efts/$id/signals")({
-  component: EftPage,
+  component: EftSignalsPage,
   loader: async ({ params }) =>
     await client.api.yahoo
       .chart({ symbol: `${params.id.toUpperCase()}.AX` })({ interval: "1d" })
       .get(),
 });
 
-function EftPage() {
+function EftSignalsPage() {
   const { id } = Route.useParams();
   const d = useLoaderData({ from: "/efts/$id/signals" });
 

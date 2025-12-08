@@ -4,17 +4,22 @@
 
 This is NOT financial advice, always consult certified financial advice.
 
+This is NOT a secure application, always secure your personal and financial information.
+
+Use this application at your own risk, it does not come with any warrenty, and it is not liable for any damages or losses as a result of damages, harm or loss of value. As a result of your useage of it. You are personally responsable for yourself, your finances and your security.
+
 ## About
 
 This app merely collects financial information & derives numbers from calculations.
 
 Provides me with a dashboard of financial securities.
 
+* Raw data
+* Derived data
 * Rating scores
 * Timing indicators
 * Charts & histograms
-* Raw data
-* Derived data
+* Comparison & testing tools
 * etc.
 
 ## Dependencies

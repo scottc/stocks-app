@@ -9,6 +9,8 @@ const RootLayout = () => (
     <Disclaimer />
 
     <Toolbar>
+      <Link to="/dashboard">Dashboard</Link>
+      {" | "}
       <Link to="/accounts">Accounts</Link>
       {" | "}
       <Link to="/efts">EFTs</Link>

@@ -78,9 +78,27 @@ function EftPage() {
           View Chart
         </Link>
         {" | "}
+        <Link to="/efts/$id/signals" params={{ id }}>
+          View Signals
+        </Link>
+        {" | "}
+        <Link to="/efts/$id/score" params={{ id }}>
+          View Score
+        </Link>
+        {" | "}
         <Link to="/efts/$id/chart-webgpu" params={{ id }}>
           WebGPU Experiment
         </Link>
+        {" | "}
+        <a href={`https://finance.yahoo.com/chart/${id.toUpperCase()}.AX`}>
+          Yahoo Chart
+        </a>
+        {" | "}
+        <a
+          href={`https://www.tradingview.com/chart/?symbol=ASX%3A${id.toUpperCase()}`}
+        >
+          TradingView Chart
+        </a>
       </Toolbar>
 
       <h2 style={{ textAlign: "center" }}>{id.toUpperCase()}</h2>
@@ -95,6 +113,10 @@ function EftPage() {
       {" | "}
       <Link to="/efts/$id/signals" params={{ id }}>
         View Signals
+      </Link>
+      {" | "}
+      <Link to="/efts/$id/score" params={{ id }}>
+        View Score
       </Link>
       {" | "}
       <Link to="/efts/$id/chart-webgpu" params={{ id }}>

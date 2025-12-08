@@ -5,14 +5,14 @@ import type { EChartsOption } from "@/components/echarts-for-react";
 import EChartsReact from "@/components/echarts-for-react";
 
 export const Route = createFileRoute("/efts/$id/chart")({
-  component: EftPage,
+  component: EftChartPage,
   loader: async ({ params }) =>
     await client.api.yahoo
       .chart({ symbol: `${params.id.toUpperCase()}.AX` })({ interval: "1d" })
       .get(),
 });
 
-function EftPage() {
+function EftChartPage() {
   const d = useLoaderData({ from: "/efts/$id/chart" });
   const val = d.data?.value;
 

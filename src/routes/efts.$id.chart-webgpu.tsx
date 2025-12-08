@@ -1,6 +1,6 @@
 import client from "@/client";
 import { createFileRoute, useLoaderData } from "@tanstack/react-router";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export const Route = createFileRoute("/efts/$id/chart-webgpu")({
   component: ChartWebGPUPage,
@@ -26,6 +26,7 @@ function ChartWebGPUPage() {
 }
 
 const HelloTriangleWebGPU: React.FC<{ data?: any }> = () => {
+  const [error, setError] = useState("");
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationRef = useRef<number | null>(null);
 
@@ -34,17 +35,14 @@ const HelloTriangleWebGPU: React.FC<{ data?: any }> = () => {
       const canvas = canvasRef.current!;
       if (!canvas) return;
 
-      // --------------------------------------------------------------
-      // 1. WebGPU setup
-      // --------------------------------------------------------------
       if (!navigator.gpu) {
-        alert("WebGPU is not supported in this browser");
+        setError("WebGPU is not supported in this browser");
         return;
       }
 
       const adapter = await navigator.gpu.requestAdapter();
       if (!adapter) {
-        alert("No GPU adapter found");
+        setError("No GPU adapter found");
         return;
       }
 
@@ -58,9 +56,6 @@ const HelloTriangleWebGPU: React.FC<{ data?: any }> = () => {
         alphaMode: "premultiplied",
       });
 
-      // --------------------------------------------------------------
-      // 2. WGSL shader (vertex + fragment)
-      // --------------------------------------------------------------
       const shaderCode = `
         @vertex
         fn vs_main(@builtin(vertex_index) idx: u32) -> @builtin(position) vec4<f32> {
@@ -82,9 +77,6 @@ const HelloTriangleWebGPU: React.FC<{ data?: any }> = () => {
 
       const shaderModule = device.createShaderModule({ code: shaderCode });
 
-      // --------------------------------------------------------------
-      // 3. Render pipeline (no buffers – vertex_index is enough)
-      // --------------------------------------------------------------
       const pipeline = device.createRenderPipeline({
         layout: "auto",
         vertex: {
@@ -99,9 +91,6 @@ const HelloTriangleWebGPU: React.FC<{ data?: any }> = () => {
         primitive: { topology: "triangle-list" },
       });
 
-      // --------------------------------------------------------------
-      // 4. Render loop
-      // --------------------------------------------------------------
       const render = () => {
         const commandEncoder = device.createCommandEncoder();
         const textureView = context.getCurrentTexture().createView();
@@ -123,6 +112,8 @@ const HelloTriangleWebGPU: React.FC<{ data?: any }> = () => {
 
         device.queue.submit([commandEncoder.finish()]);
         animationRef.current = requestAnimationFrame(render);
+
+        console.log("rendered");
       };
 
       render();
@@ -137,6 +128,7 @@ const HelloTriangleWebGPU: React.FC<{ data?: any }> = () => {
 
   return (
     <div>
+      {error !== "" ? <>Error: {error}</> : <></>}
       <canvas ref={canvasRef} width={600} height={400} />
     </div>
   );
