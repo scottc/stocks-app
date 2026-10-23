@@ -1,0 +1,55 @@
+:root {
+  color-scheme: light dark;
+  font-family: system-ui, sans-serif;
+  line-height: 1.45;
+}
+
+body {
+  margin: 0;
+  background: Canvas;
+  color: CanvasText;
+}
+
+.app {
+  max-width: 56rem;
+  margin: 0 auto;
+  padding: 1rem 1.25rem 3rem;
+}
+
+.disclaimer {
+  border: 1px solid color-mix(in srgb, CanvasText 20%, transparent);
+  border-radius: 0.5rem;
+  padding: 0.6rem 0.9rem;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+.toolbar {
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid color-mix(in srgb, CanvasText 15%, transparent);
+}
+
+.toolbar a {
+  color: inherit;
+  text-decoration: none;
+  padding: 0.15rem 0.2rem;
+}
+
+.toolbar a.active {
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.content .page h1 {
+  margin: 0 0 0.5rem;
+  font-size: 1.75rem;
+}
+
+.page-meta {
+  margin-top: 2rem;
+  font-size: 0.85rem;
+  opacity: 0.65;
+}

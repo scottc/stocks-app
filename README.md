@@ -59,3 +59,19 @@ To unit test:
 ```sh
 bun test
 ```
+
+## WIP port to roc lang (basic-webserver & joy)
+
+```sh
+nix run github:lukewilliamboswell/roc-blueprint/0.8.0 -- run check
+
+nix run github:lukewilliamboswell/roc-blueprint/0.8.0 -- run shell
+
+# 1) WASM
+roc build --target=wasm32 frontend/app.roc --output=frontend/www/app.wasm
+
+# 2) Joy runtime.js
+# cp .cache/vendor/joy/hash/runtime.js frontend/www/runtime.js
+
+nix run github:lukewilliamboswell/roc-blueprint/0.8.0 -- run run
+```
