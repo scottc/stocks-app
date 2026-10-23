@@ -1,20 +1,26 @@
-# Scott's Financial Dashboard
+# Scott's Finance Cockpit
 
 ## DISCLAIMER
 
-This is NOT financial advice, always consult certified financial advice.
+This is NOT financial advice, always consult qualified financial advice in your legal jurisdiction.
 
-This is NOT a secure application, always secure your personal and financial information.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-Use this application at your own risk, it does not come with any warrenty, and it is not liable for any damages or losses as a result of damages, harm or loss of value. As a result of your useage of it. You are personally responsable for yourself, your finances and your security.
+AUDIT THE SOFTWARE PRIOR TO USEAGE!
 
 ## About
 
-This app merely collects financial information & derives numbers from calculations.
+Let's you drive your finances, banking, investments & accounts; via a cockpit with various dashoards, trading tools, management tools, analysis tools, tax tools, personalized strategies, goals, tests, automated AI harnesses & manual approval workflows.
 
-Provides me with a dashboard of financial securities.
+Plug in your liquid capital, maximize real returns, minimize risk, effort & cost.
 
-* Raw data
+This app merely collects financial information & derives numbers from calculations. As a means to drive finances & investments. The end goal is to make an automated AI harness sandbox, with tailored visual reports, financial goals, projections, risk asessments, manual reviews & approvals, tools for managing data for taxes etc.
+
+Provides a dashboard of financial securities.
+
+* Raw stock ticker data
+* Accounts
+* Trades
 * Derived data
 * Rating scores
 * Timing indicators
@@ -63,12 +69,12 @@ bun test
 ## WIP port to roc lang (basic-webserver & joy)
 
 ```sh
-nix run github:lukewilliamboswell/roc-blueprint/0.8.0 -- run check
+nix run github:lukewilliamboswell/roc-blueprint/0.8.0 -- run ci
 
 nix run github:lukewilliamboswell/roc-blueprint/0.8.0 -- run shell
 
-# 1) WASM
-roc build --target=wasm32 frontend/app.roc --output=frontend/www/app.wasm
+# 1) build client
+roc build --target=wasm32 app/client.roc --output=app/www/client.wasm
 
 # 2) Joy runtime.js
 # cp .cache/vendor/joy/hash/runtime.js frontend/www/runtime.js

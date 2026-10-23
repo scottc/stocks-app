@@ -1,7 +1,6 @@
 app [Context, program] {
     http: "https://github.com/roc-lang/http/releases/download/1.0.0/6ZUwqYhCS8PU9Mo6MF7oV82ET2o7KYb57CLKDq4cq4sS.tar.zst",
     pf: platform "https://github.com/roc-lang/basic-webserver/releases/download/0.18.0/9VgbC77zLmYYgxLpiNGCq3eySyRCbE2RriAM4sjr2y81.tar.zst",
-    roc: "nightly-2026-10-09-258ab27",
 }
 
 import pf.Env
@@ -10,11 +9,16 @@ import pf.Path
 import http.Response
 import Routes
 import Asx
-import Yahoo
+import YahooLoader
 import AlphaVantage
 import Commsec
 
-Context : { alpha_vantage_key : Str }
+Context : {
+    alpha_vantage_key : Str,
+    # FINNHUB_API_KEY=
+    # FINANCIAL_MODELING_PREP_API_KEY=
+    # ALPHA_VANTAGE_API_KEY=
+}
 
 program = { init!, respond!, shutdown! }
 
@@ -38,16 +42,17 @@ respond! = |request, context| {
 
     match (method, path) {
         ## Joy SPA shell + assets (cwd = project root)
-        (GET, []) => serve_static!("frontend/www/index.html", "text/html; charset=utf-8")
-        (GET, ["index.html"]) => serve_static!("frontend/www/index.html", "text/html; charset=utf-8")
-        (GET, ["style.css"]) => serve_static!("frontend/www/style.css", "text/css; charset=utf-8")
-        (GET, ["app.wasm"]) => serve_static!("frontend/www/app.wasm", "application/wasm")
-        (GET, ["runtime.js"]) => serve_static!("frontend/www/runtime.js", "application/javascript; charset=utf-8")
+        (GET, []) => serve_static!("app/www/index.html", "text/html; charset=utf-8")
+        (GET, ["favicon.ico"]) => serve_static!("app/www/favicon.ico", "text/html; charset=utf-8")
+        (GET, ["index.html"]) => serve_static!("app/www/index.html", "text/html; charset=utf-8")
+        (GET, ["style.css"]) => serve_static!("app/www/style.css", "text/css; charset=utf-8")
+        (GET, ["client.wasm"]) => serve_static!("app/www/client.wasm", "application/wasm")
+        (GET, ["runtime.js"]) => serve_static!("app/www/runtime.js", "application/javascript; charset=utf-8")
 
         ## API
         (GET, ["api", "asx"]) => Asx.listed_companies!(context)
         (GET, ["api", "yahoo", "chart", symbol, interval]) =>
-            Yahoo.chart!(symbol, interval, context)
+            YahooLoader.chart!(symbol, interval, context)
         (GET, ["api", "alphavantage", "LISTING_STATUS"]) =>
             AlphaVantage.listing_status!(context)
         (GET, ["api", "alphavantage", "NEWS_SENTIMENT", tickers]) =>
@@ -69,6 +74,8 @@ respond! = |request, context| {
 ## Read a file under the process cwd and return it with a Content-Type.
 serve_static! : Str, Str => Try(Server.Outcome, [ServerErr(Str)])
 serve_static! = |rel_path, content_type| {
+    # TODO: Files from in-memory cache, don't read from disk on every request!
+    # TODO: Also support hot-reload?
     match Path.read_bytes!(Path.utf8(rel_path)) {
         Ok(bytes) =>
             Ok(
@@ -115,20 +122,3 @@ text_response = |status, body|
             .with_headers([{ name: "Content-Type", value: "text/plain; charset=utf-8" }])
             .with_body(Str.to_utf8(body)),
     )
-
-home_html : Str
-home_html =
-    \\<!DOCTYPE html>
-    \\<html>
-    \\<head><title>stocks-app</title></head>
-    \\<body>
-    \\  <h1>stocks-app (Roc)</h1>
-    \\  <p>API stubs are up. Joy frontend next.</p>
-    \\  <ul>
-    \\    <li><a href="/api/asx">/api/asx</a></li>
-    \\    <li><a href="/api/yahoo/chart/AAPL/1d">/api/yahoo/chart/AAPL/1d</a></li>
-    \\    <li><a href="/api/alphavantage/LISTING_STATUS">/api/alphavantage/LISTING_STATUS</a></li>
-    \\    <li><a href="/api/commsec/accounts">/api/commsec/accounts</a></li>
-    \\  </ul>
-    \\</body>
-    \\</html>

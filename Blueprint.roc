@@ -10,13 +10,13 @@ config = [
         "dev",
         [
             Programs([
-                Fetch("roc", Recipes.roc_nightly("nightly-2026-10-09-258ab27")),
+                Fetch("roc", Recipes.roc_nightly("nightly-2026-10-21-5349569")),
             ]),
             Expect(["git"]),
         ],
     ),
     Shell("default", [Use("dev")]),
-    Task("check", [Use("dev"), Run(["roc", "check", "server/main.roc"])]),
-    Task("run", [Use("dev"), Run(["roc", "server/main.roc"])]),
-    Task("build", [Use("dev"), Run(["roc", "build", "--optimize", "server/main.roc"])]),
+    Task("ci", [Use("dev"), Run(["roc", "run", "scripts/ci.roc"])]),
+    Task("build-client", [Use("dev"), Run(["roc", "build", "--target=wasm32", "app/client.roc", "--output=app/www/client.wasm"])]),
+    Task("run", [Use("dev"), Run(["roc", "app/server.roc"])]),
 ]

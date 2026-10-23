@@ -37,5 +37,6 @@ report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 .DS_Store
 
 # Roc lang port
-frontend/www/app.wasm
-frontend/www/runtime.js
+app/www/client.wasm
+app/www/runtime.js
+.blueprint/

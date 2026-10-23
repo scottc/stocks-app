@@ -13,7 +13,7 @@
     import { mount } from './runtime.js';
 
     window.app = await mount({
-      wasm: './app.wasm',
+      wasm: './client.wasm',
       root: document.getElementById('app'),
       flags: '',
     });
