@@ -17,6 +17,5 @@ config = [
     ),
     Shell("default", [Use("dev")]),
     Task("ci", [Use("dev"), Run(["roc", "run", "scripts/ci.roc"])]),
-    Task("build-client", [Use("dev"), Run(["roc", "build", "--target=wasm32", "app/client.roc", "--output=app/www/client.wasm"])]),
-    Task("run", [Use("dev"), Run(["roc", "app/server.roc"])]),
+    Task("run", [Use("dev"), Run(["roc", "run", "scripts/run.roc"])]),
 ]

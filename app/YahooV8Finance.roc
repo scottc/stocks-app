@@ -1,94 +1,104 @@
+#import parser.Json
+import parser.JsonValue
+
 YahooV8Finance := {}.{
 
-    to_str : Chart -> Str
-    to_str = |chart|
-        match Json.to_str_try(chart) {
-            Ok(str) => str
-            Err(_e) => ""
-        }
+    # to_str : Chart -> Str
+    # to_str = |chart|
+    #     match Json.to_str_try(chart) {
+    #         Ok(str) => str
+    #         Err(_e) => ""
+    #     }
 
     Chart : {
-        chart?: YahooChart,
+        chart: YahooChart,
     }
 
     YahooChart : {
-        result?: List(YahooChartResultItem),
-        error?: [Str(Str), Null],
+        result: List(YahooChartResultItem),
+        #error: [Str(Str), Null],
+    }
+
+    YahooChartError : {
+        code: Str,
+        description: Str,
     }
 
     YahooChartResultItem : {
-        meta?: YahooMeta,
-        timestamp?: List(I64),
-        indicators?: YahooChartIndicators,
+        meta: YahooMeta,
+        timestamp: List(I64),
+        indicators: YahooChartIndicators,
     }
 
     YahooMeta : {
-        currency?: Str,
-        symbol?: Str,
-        exchangeName?: Str,
-        fullExchangeName?: Str,
-        instrumentType?: Str,
-        firstTradeDate?: [Known(I64), Unknown],
-        regularMarketTime?: [Known(I64), Unknown],
-        hasPrePostMarketData?: [Known(Bool), Unknown],
-        gmtoffset?: [Known(I64), Unknown],
-        timezone?: Str,
-        exchangeTimezoneName?: Str,
-        regularMarketPrice?: F64,
-        fiftyTwoWeekHigh?: F64,
-        fiftyTwoWeekLow?: F64,
-        regularMarketDayHigh?: F64,
-        regularMarketDayLow?: F64,
-        regularMarketVolume?: I64,
-        longName?: Str,
-        shortName?: Str,
-        chartPreviousClose?: F64,
-        priceHint?: [Known(I64), Unknown],
-        currentTradingPeriod?: TradingPeriods,
-        dataGranularity?: Str, #DataGranularity,
-        range?: [Known(Str), Unknown],
-        validRanges?: [Known(List(Str)), Unknown],
+        currency: Str,
+        symbol: Str,
+        exchangeName: Str,
+        fullExchangeName: Str,
+        instrumentType: Str,
+
+        firstTradeDate: I64,
+        regularMarketTime: I64,
+        hasPrePostMarketData: Bool,
+        gmtoffset: I64,
+
+        timezone: Str,
+        exchangeTimezoneName: Str,
+
+        regularMarketPrice: F64,
+        regularMarketChangePercent: F64,
+        fulldayPrice: F64,
+        fulldayChange: F64,
+        fulldayChangePercent: F64,
+
+        fiftyTwoWeekHigh: F64,
+        fiftyTwoWeekLow: F64,
+        regularMarketDayHigh: F64,
+        regularMarketDayLow: F64,
+        regularMarketVolume: I64,
+
+        longName: Str,
+        shortName: Str,
+
+        chartPreviousClose: F64,
+        priceHint: I64,
+
+        currentTradingPeriod: TradingPeriods,
+
+        dataGranularity: Str,
+        range: Str,
+        validRanges: List(Str),
     }
 
     TradingPeriods : {
-        pre?: TradingHours,
-        regular?: TradingHours,
-        post?: TradingHours,
+        pre: TradingHours,
+        regular: TradingHours,
+        post: TradingHours,
     }
 
     TradingHours : {
-        timezone?: Str,
-        start?: I64,
-        end?: I64,
-        gmtoffset?: I64,
+        timezone: Str,
+        start: I64,
+        end: I64,
+        gmtoffset: I64,
     }
 
     YahooChartIndicators : {
-        quote?: List(YahooQuote),
-        adjclose?: List(AdjClose),
+        quote: List(YahooQuote),
+        adjclose: Try(List(AdjClose), [Missing]),
     }
 
     AdjClose : {
-        adjclose?: List([Num(F64), Null]),
+        adjclose: List(Try(F64, [Null])),
     }
 
     YahooQuote : {
-        high?: List([Num(F64), Null]),
-        volume?: List([Num(I64), Null]),
-        close?: List([Num(F64), Null]),  # deprecated in TS source; prefer adjclose
-        low?: List([Num(F64), Null]),
-        open?: List([Num(F64), Null]),
+        high: List(Try(F64, [Null])),
+        low: List(Try(F64, [Null])),
+        volume: List(Try(F64, [Null])),
+        close: List(Try(F64, [Null])),
+        open: List(Try(F64, [Null])),
     }
-
-    DataGranularity : [
-        OneMinute,
-        FiveMinute,
-        OneHour,
-        OneDay,
-        OneWeek,
-        OneMonth,
-        Other(Str),
-    ]
 }
 
 expect {

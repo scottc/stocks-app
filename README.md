@@ -69,15 +69,8 @@ bun test
 ## WIP port to roc lang (basic-webserver & joy)
 
 ```sh
-nix run github:lukewilliamboswell/roc-blueprint/0.8.0 -- run ci
-
-nix run github:lukewilliamboswell/roc-blueprint/0.8.0 -- run shell
-
-# 1) build client
-roc build --target=wasm32 app/client.roc --output=app/www/client.wasm
+nix run github:lukewilliamboswell/roc-blueprint/0.8.0 -- run run
 
 # 2) Joy runtime.js
 # cp .cache/vendor/joy/hash/runtime.js frontend/www/runtime.js
-
-nix run github:lukewilliamboswell/roc-blueprint/0.8.0 -- run run
 ```
